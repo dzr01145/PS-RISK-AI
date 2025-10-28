@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ブルーシールド・リスクカウンシル</title>
+  <title>製品リスク AIアシスタント</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -47,45 +47,43 @@
     }
 
     header {
-      padding: clamp(1.8rem, 4vw, 2.6rem);
-      background: radial-gradient(circle at top left, rgba(23, 103, 193, 0.18), transparent 60%);
+      padding: clamp(1.8rem, 4vw, 2.4rem);
+      background: radial-gradient(circle at top left, rgba(23, 103, 193, 0.2), transparent 60%);
       border-bottom: 1px solid var(--border);
+      text-align: center;
     }
 
     h1 {
       margin: 0;
       font-weight: 700;
-      font-size: clamp(2.1rem, 4.5vw, 2.8rem);
+      font-size: clamp(2.2rem, 5vw, 3rem);
       color: var(--blue);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
     }
 
     .lead {
-      margin: 0.6rem 0 1rem;
-      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      margin: 0.4rem 0 0;
+      font-size: clamp(1.05rem, 2.6vw, 1.25rem);
       color: var(--text-soft);
       font-weight: 600;
-    }
-
-    .descriptor {
-      margin: 0;
-      font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+      letter-spacing: 0.1em;
     }
 
     .badge-row {
-      margin-top: 1.2rem;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.6rem;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.4rem 0.9rem;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
       border-radius: 999px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       letter-spacing: 0.03em;
       color: var(--blue);
       background: var(--blue-soft);
@@ -348,12 +346,8 @@
 <body>
   <main>
     <header>
-      <h1>ブルーシールド・リスクカウンシル</h1>
-      <p class="lead">製品安全・品質不正・リコール対応に特化したエキスパートチャット</p>
-      <p class="descriptor">
-        現場で意思決定を担う品質保証・製造責任者のために設計された相談窓口です。
-        最新の Gemini Flash モデルと連携し、戦略・制度・実務までワンストップでサポートします。
-      </p>
+      <h1>製品リスク　AIアシスタント</h1>
+      <p class="lead">― 製品安全・品質トラブルのAI相談 ―</p>
       <div class="badge-row">
         <span class="badge">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 9.97-4.99L12 2zm0 7.73L4.18 6.6 12 3.27l7.82 3.33L12 9.73zM12 13l-7.82-3.33.01 3.91L12 17l7.81-3.42v-3.91L12 13zM4.19 16.09 12 19.73l7.81-3.64v2.71L12 22l-7.81-3.2v-2.71z"/></svg>
@@ -384,7 +378,7 @@
       </section>
       <aside class="guide-panel">
         <section>
-          <h2>想定ユースケース</h2>
+      <h2>想定ユースケース</h2>
           <ul>
             <li>サプライヤー由来の品質不正疑義を受けた際の初動整理</li>
             <li>海外市場への自主回収を検討する際のマイルストーン設計</li>
@@ -399,14 +393,6 @@
             <button type="button" class="suggestion-btn" data-message="品質不正の再発防止策を構築するためのステップを教えてほしい。">品質不正再発防止のフレーム</button>
             <button type="button" class="suggestion-btn" data-message="PL訴訟を見据えた証拠保全と社内体制の注意点を知りたい。">PL訴訟対策の体制ポイント</button>
             <button type="button" class="suggestion-btn" data-message="並行輸入品の安全リスク評価をどう行えばよいか？">並行輸入品のリスク評価</button>
-          </div>
-        </section>
-        <section>
-          <h2>前提条件</h2>
-          <div class="chips">
-            <span class="chip">Gemini Flash モデルを使用 (環境変数指定)</span>
-            <span class="chip">認証は Basic 認証で保護済み</span>
-            <span class="chip">相談内容はサーバー側でのみ処理</span>
           </div>
         </section>
       </aside>
@@ -489,12 +475,17 @@
           }
 
           const data = await response.json();
-          const reply = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
+          let reply = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
+          let statusMessage = data.notice || 'Gemini モデルと接続しました。';
+          if (reply.length > 300) {
+            reply = reply.slice(0, 300).trimEnd() + '…';
+            statusMessage = '300文字以内に要約して表示しました。';
+          }
 
           thinking.classList.remove('thinking');
           thinking.textContent = reply;
           conversation.push({ role: 'model', text: reply });
-          renderStatus(data.notice || 'Gemini モデルと接続しました。', 'success');
+          renderStatus(statusMessage, 'success');
         } catch (error) {
           thinking.classList.remove('thinking');
           thinking.textContent = 'エラーが発生しました。少し時間を空けて再試行してください。';
