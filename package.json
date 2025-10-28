@@ -1,0 +1,17 @@
+{
+  "name": "akane-chatbot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Render-deployed Akane chatbot with Gemini integration via secure backend.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "PORT=3000 node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

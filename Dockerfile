@@ -1,9 +1,15 @@
-FROM nginx:alpine
+FROM node:20-alpine
 
-RUN apk add --no-cache apache2-utils \
-    && htpasswd -Bbn admin 123 > /etc/nginx/.htpasswd
+WORKDIR /app
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY index.html /usr/share/nginx/html/index.html
+COPY package.json package-lock.json ./
 
-EXPOSE 80
+RUN npm ci --omit=dev
+
+COPY public ./public
+COPY server.js ./server.js
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["npm", "start"]

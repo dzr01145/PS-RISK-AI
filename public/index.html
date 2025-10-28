@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>あかねチャットボット</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.6;
+      color-scheme: light dark;
+      --akane-primary: #c81d25;
+      --akane-primary-soft: #fde5e7;
+      --akane-surface: rgba(255, 255, 255, 0.94);
+      --akane-text-strong: #2c1813;
+      --akane-text-soft: #7a1218;
+      --akane-border: rgba(200, 29, 37, 0.18);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+      background:
+        radial-gradient(circle at top, rgba(255, 139, 139, 0.25), transparent 60%),
+        linear-gradient(120deg, #fff5f5, #ffe6e6);
+      color: var(--akane-text-strong);
+    }
+    main {
+      width: min(880px, 96vw);
+      background: var(--akane-surface);
+      border-radius: 28px;
+      box-shadow: 0 30px 65px rgba(178, 34, 34, 0.18);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    header {
+      padding: clamp(1.6rem, 4vw, 2.6rem);
+      border-bottom: 1px solid var(--akane-border);
+      background: linear-gradient(135deg, rgba(200, 29, 37, 0.12), rgba(254, 140, 148, 0.12));
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      color: var(--akane-primary);
+      letter-spacing: 0.08em;
+    }
+    .tagline {
+      margin: 0.3rem 0 0.6rem;
+      font-weight: 600;
+      font-size: clamp(1rem, 2.4vw, 1.1rem);
+      color: var(--akane-text-soft);
+    }
+    header p.lead {
+      margin: 0;
+      font-size: clamp(0.95rem, 2.4vw, 1rem);
+    }
+    .security-note {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: rgba(122, 18, 24, 0.72);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .security-note svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .chat-wrapper {
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      height: min(72vh, 560px);
+    }
+    .messages {
+      padding: clamp(1.2rem, 3vw, 1.8rem);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+    }
+    .bubble {
+      max-width: min(78%, 420px);
+      padding: 0.95rem 1.2rem;
+      margin-bottom: 1rem;
+      border-radius: 22px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.05);
+      line-height: 1.7;
+    }
+    .bubble.user {
+      background: var(--akane-primary);
+      color: #fff;
+      margin-left: auto;
+      border-bottom-right-radius: 8px;
+    }
+    .bubble.bot {
+      background: #fff4f4;
+      border: 1px solid rgba(200, 29, 37, 0.2);
+      color: var(--akane-text-soft);
+      margin-right: auto;
+      border-bottom-left-radius: 8px;
+    }
+    .bubble.bot.thinking {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(122, 18, 24, 0.85);
+    }
+    .bubble.bot.thinking::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 9px 0 0 currentColor, 18px 0 0 currentColor;
+      animation: dots 1s infinite linear;
+    }
+    @keyframes dots {
+      0%   { box-shadow: 9px 0 0 currentColor, 18px 0 0 currentColor; }
+      33%  { box-shadow: 9px 0 0 currentColor, 18px 0 -6px currentColor; }
+      66%  { box-shadow: 9px 0 -6px currentColor, 18px 0 -6px currentColor; }
+      100% { box-shadow: 9px 0 0 currentColor, 18px 0 0 currentColor; }
+    }
+    .status-bar {
+      padding: 0.75rem 1.6rem;
+      font-size: 0.9rem;
+      border-top: 1px solid var(--akane-border);
+      color: rgba(122, 18, 24, 0.85);
+      background: rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .status-bar svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .status-bar.error {
+      color: #b42318;
+      background: rgba(255, 237, 232, 0.8);
+    }
+    .status-bar.success {
+      color: #1b6d2f;
+      background: rgba(226, 248, 233, 0.9);
+    }
+    form {
+      display: flex;
+      gap: 0.9rem;
+      padding: clamp(1rem, 3vw, 1.4rem);
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid var(--akane-border);
+    }
+    input[type="text"] {
+      flex: 1;
+      border: 1px solid rgba(200, 29, 37, 0.35);
+      border-radius: 999px;
+      padding: 0.95rem 1.3rem;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.92);
+      color: inherit;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--akane-primary);
+      box-shadow: 0 0 0 4px rgba(200, 29, 37, 0.2);
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.95rem 1.9rem;
+      background: var(--akane-primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px rgba(200, 29, 37, 0.24);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      background: #d57676;
+      box-shadow: none;
+    }
+    .suggestions {
+      padding: 0.4rem clamp(1.2rem, 3vw, 1.6rem) 1.1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.75);
+      border-top: 1px solid rgba(200, 29, 37, 0.1);
+    }
+    .suggestion {
+      border: 1px solid rgba(200, 29, 37, 0.25);
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      background: rgba(200, 29, 37, 0.05);
+      color: var(--akane-text-soft);
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .suggestion:hover {
+      background: rgba(200, 29, 37, 0.15);
+      transform: translateY(-1px);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (max-width: 640px) {
+      body {
+        padding: 1.2rem 0.6rem;
+      }
+      main {
+        border-radius: 0;
+        width: 100%;
+      }
+      .chat-wrapper {
+        height: 75vh;
+      }
+      button {
+        padding: 0.9rem 1.2rem;
+      }
+      .suggestions {
+        gap: 0.4rem;
+      }
+      .suggestion {
+        padding: 0.45rem 0.85rem;
+        font-size: 0.88rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>あかねチャットボット</h1>
+      <p class="tagline">気軽に話せるミニアシスタント。Google Generative AI と連携して多彩に応答します。</p>
+      <p class="lead">Render の環境変数に <code>GOOGLE_API_KEY</code> を設定すると、Gemini 1.5 Flash が会話をサポートします。キーが無い場合は内蔵の簡易応答で対応します。</p>
+      <p class="security-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 10.75c-.69 0-1.25-.56-1.25-1.25V7.5c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25v3c0 .69-.56 1.25-1.25 1.25Zm1.5 4.75h-3c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3c.41 0 .75.34.75.75s-.34.75-.75.75Z"/></svg>
+        このページは Basic 認証で保護され、会話内容はサーバー内でのみ処理されます。
+      </p>
+    </header>
+    <div class="chat-wrapper">
+      <section class="messages" id="messages" aria-live="polite"></section>
+      <div class="suggestions" id="suggestions" aria-label="会話のきっかけ">
+        <button type="button" class="suggestion" data-message="今日のおすすめの過ごし方を教えて。">今日のおすすめの過ごし方</button>
+        <button type="button" class="suggestion" data-message="最近のテクノロジーの面白い話題は？">テクノロジーの話題</button>
+        <button type="button" class="suggestion" data-message="集中力を高めるちょっとしたコツが知りたい。">集中力アップのコツ</button>
+        <button type="button" class="suggestion" data-message="気分転換のアイデアをいくつか提案して。">気分転換のアイデア</button>
+      </div>
+      <div class="status-bar" id="status-bar" role="status">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>
+        API キーが設定されていない場合はシンプルな内蔵応答で返答します。
+      </div>
+      <form id="chat-form" autocomplete="off">
+        <label class="sr-only" for="chat-input">メッセージを入力</label>
+        <input id="chat-input" type="text" name="message" placeholder="メッセージを入力..." required>
+        <button type="submit">送信</button>
+      </form>
+    </div>
+  </main>
+  <script>
+    (() => {
+      const messagesEl = document.getElementById('messages');
+      const form = document.getElementById('chat-form');
+      const input = document.getElementById('chat-input');
+      const statusBar = document.getElementById('status-bar');
+      const suggestionButtons = document.querySelectorAll('.suggestion');
+
+      const conversation = [];
+      let isBusy = false;
+
+      const addMessage = (text, role) => {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${role}`;
+        bubble.textContent = text;
+        messagesEl.appendChild(bubble);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return bubble;
+      };
+
+      const updateStatus = (message, variant = "default") => {
+        statusBar.textContent = "";
+        statusBar.classList.remove('error', 'success');
+        if (variant === 'error') statusBar.classList.add('error');
+        if (variant === 'success') statusBar.classList.add('success');
+
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        if (variant === 'error') {
+          path.setAttribute('d', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z');
+        } else if (variant === 'success') {
+          path.setAttribute('d', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 14-4-4 1.41-1.41L11 13.17l4.59-4.58L17 10l-6 6Z');
+        } else {
+          path.setAttribute('d', 'M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z');
+        }
+        icon.appendChild(path);
+        statusBar.appendChild(icon);
+        statusBar.appendChild(document.createTextNode(message));
+      };
+
+      const setBusy = (busy) => {
+        isBusy = busy;
+        input.disabled = busy;
+        form.querySelector('button[type="submit"]').disabled = busy;
+      };
+
+      const sendMessage = async (text) => {
+        const trimmed = text.trim();
+        if (!trimmed || isBusy) return;
+        setBusy(true);
+        addMessage(trimmed, 'user');
+        conversation.push({ role: 'user', text: trimmed });
+
+        const thinkingBubble = addMessage('考え中...', 'bot');
+        thinkingBubble.classList.add('thinking');
+
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: trimmed,
+              history: conversation
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `サーバーエラー (${response.status})`);
+          }
+
+          const data = await response.json();
+          const reply = (data.reply || 'うまく返答できませんでした。もう一度試してください。').trim();
+
+          thinkingBubble.classList.remove('thinking');
+          thinkingBubble.textContent = reply;
+          conversation.push({ role: 'model', text: reply });
+          updateStatus(data.notice || 'Gemini モデルと接続中です。', 'success');
+        } catch (error) {
+          thinkingBubble.classList.remove('thinking');
+          thinkingBubble.textContent = 'エラーが発生しました。少し時間をおいて再度お試しください。';
+          updateStatus(error.message || '予期しないエラーが発生しました。', 'error');
+        } finally {
+          setBusy(false);
+          input.focus();
+        }
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const value = input.value;
+        input.value = '';
+        sendMessage(value);
+      });
+
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          form.dispatchEvent(new Event('submit'));
+        }
+      });
+
+      suggestionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          input.value = button.dataset.message;
+          input.focus();
+        });
+      });
+
+      const welcome = 'こんにちは、私は「あかねチャットボット」です。話題はお任せください。気になることを自由に聞いてみてくださいね。';
+      addMessage(welcome, 'bot');
+      conversation.push({ role: 'model', text: welcome });
+    })();
+  </script>
+</body>
+</html>
