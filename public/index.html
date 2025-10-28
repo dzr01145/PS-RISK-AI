@@ -198,6 +198,14 @@
       margin: 0.8rem 0;
     }
 
+    .bubble.bot p strong.reply-label {
+      display: inline-block;
+      min-width: 6em;
+      margin-right: 0.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
     .status-bar {
       display: flex;
       align-items: center;
@@ -511,9 +519,20 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 
+      const renderInline = (text) => text
+        .split(/(\*\*[^*]+\*\*)/g)
+        .map((segment) => {
+          const bold = segment.match(/^\*\*([^*]+)\*\*$/);
+          if (bold) {
+            return `<strong>${escapeHtml(bold[1].trim())}</strong>`;
+          }
+          return escapeHtml(segment);
+        })
+        .join('');
+
       const formatPlainText = (text) => text
         .split(/\n{2,}/)
-        .map((block) => `<p>${escapeHtml(block)}</p>`)
+        .map((block) => `<p>${renderInline(block)}</p>`)
         .join('');
 
       const formatReply = (raw) => {
@@ -571,7 +590,14 @@
           }
 
           closeLists();
-          htmlParts.push(`<p>${escapeHtml(line)}</p>`);
+          const labelMatch = line.match(/^\*\*([^*]+?:)\s*\*\*(.*)$/);
+          if (labelMatch) {
+            const label = escapeHtml(labelMatch[1].trim());
+            const rest = renderInline(labelMatch[2].trim());
+            htmlParts.push(`<p><strong class="reply-label">${label}</strong>${rest ? ` ${rest}` : ''}</p>`);
+          } else {
+            htmlParts.push(`<p>${renderInline(line)}</p>`);
+          }
         });
 
         closeLists();
