@@ -366,10 +366,7 @@
     <div class="body">
       <section class="chat-panel">
         <div class="messages" id="messages" aria-live="polite"></div>
-        <div class="status-bar" id="status-bar" role="status">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>
-          Gemini API キーが未設定の場合、このチャットは利用できません。環境変数 <code>GOOGLE_API_KEY</code> を設定し、必要に応じて <code>GOOGLE_GEMINI_MODEL</code> を更新してください。
-        </div>
+        <div class="status-bar" id="status-bar" role="status"></div>
         <form id="chat-form" autocomplete="off">
           <label class="sr-only" for="chat-input">メッセージを入力</label>
           <input id="chat-input" type="text" name="message" placeholder="相談内容を入力..." required>
@@ -517,7 +514,7 @@
         });
       });
 
-      const welcome = 'ようこそ。ブルーシールド・リスクカウンシルです。現在抱えている課題や状況をお知らせください。初動整理、法規制の確認、社内体制づくりまで幅広くサポートします。';
+      const welcome = '現在抱えている課題や状況をお知らせください。初動整理、法規制の確認、社内体制づくりまで幅広くサポートします。';
       addMessage(welcome, 'bot');
       conversation.push({ role: 'model', text: welcome });
     })();
