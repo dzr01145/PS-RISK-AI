@@ -12,6 +12,7 @@ const basicAuthUser = process.env.BASIC_AUTH_USER || 'admin';
 const basicAuthPassword = process.env.BASIC_AUTH_PASSWORD || '123';
 const apiKey = process.env.GOOGLE_API_KEY;
 const geminiModel = process.env.GOOGLE_GEMINI_MODEL || 'gemini-2.5-flash-latest';
+const fallbackGeminiModel = process.env.GOOGLE_GEMINI_FALLBACK_MODEL || 'gemini-1.5-flash-latest';
 
 const timingSafeEqual = (a, b) => {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
@@ -105,25 +106,61 @@ app.post('/api/chat', async (req, res) => {
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent`;
-  const payload = buildGeminiRequest(history, message);
+  const payload = JSON.stringify(buildGeminiRequest(history, message));
 
-  try {
+  const callGemini = async (model) => {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
     const response = await fetch(`${url}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: payload
     });
-
+    const text = await response.text();
     if (!response.ok) {
-      const errorText = await response.text();
-      return res.status(response.status).json({
-        error: `Gemini API 呼び出しに失敗しました (${response.status})`,
-        details: errorText
+      return { ok: false, status: response.status, detail: text, model };
+    }
+    let data;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = {};
+    }
+    return { ok: true, data, model };
+  };
+
+  try {
+    let primaryResult = await callGemini(geminiModel);
+    let modelUsed = geminiModel;
+    let fallbackNotice;
+
+    if (!primaryResult.ok && primaryResult.status === 404 && geminiModel !== fallbackGeminiModel) {
+      console.warn(`[Gemini] Model ${geminiModel} returned 404. Trying fallback model ${fallbackGeminiModel}.`);
+      const fallbackResult = await callGemini(fallbackGeminiModel);
+      if (fallbackResult.ok) {
+        primaryResult = fallbackResult;
+        modelUsed = fallbackGeminiModel;
+        fallbackNotice = `指定モデル ${geminiModel} が見つからなかったため、${fallbackGeminiModel} で応答しました。`;
+      } else {
+        primaryResult.detail += `\nFallback attempt (${fallbackGeminiModel}) also failed: ${fallbackResult.detail}`;
+        primaryResult.status = fallbackResult.status;
+      }
+    }
+
+    if (!primaryResult.ok) {
+      let detailMessage = primaryResult.detail;
+      try {
+        const json = JSON.parse(primaryResult.detail);
+        detailMessage = json?.error?.message || primaryResult.detail;
+      } catch {
+        // keep raw detail
+      }
+      return res.status(primaryResult.status).json({
+        error: `Gemini API 呼び出しに失敗しました (${primaryResult.status})`,
+        details: detailMessage
       });
     }
 
-    const data = await response.json();
-    const parts = data?.candidates?.[0]?.content?.parts;
+    const parts = primaryResult.data?.candidates?.[0]?.content?.parts;
     const reply = Array.isArray(parts)
       ? parts.map((part) => part?.text || '').join('\n').trim()
       : '';
@@ -136,7 +173,7 @@ app.post('/api/chat', async (req, res) => {
 
     return res.json({
       reply,
-      notice: `${geminiModel} で応答しました。`
+      notice: fallbackNotice || `${primaryResult.model || modelUsed} で応答しました。`
     });
   } catch (error) {
     return res.status(500).json({
