@@ -11,6 +11,7 @@ const publicDir = path.join(__dirname, 'public');
 const basicAuthUser = process.env.BASIC_AUTH_USER || 'admin';
 const basicAuthPassword = process.env.BASIC_AUTH_PASSWORD || '123';
 const apiKey = process.env.GOOGLE_API_KEY;
+const geminiModel = process.env.GOOGLE_GEMINI_MODEL || 'gemini-2.5-flash-latest';
 
 const timingSafeEqual = (a, b) => {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
@@ -103,7 +104,7 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent`;
   const payload = buildGeminiRequest(history, message);
 
   try {
@@ -135,7 +136,7 @@ app.post('/api/chat', async (req, res) => {
 
     return res.json({
       reply,
-      notice: 'Gemini 1.5 Flash と接続済みです。'
+      notice: `${geminiModel} で応答しました。`
     });
   } catch (error) {
     return res.status(500).json({

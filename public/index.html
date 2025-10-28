@@ -259,7 +259,7 @@
     <header>
       <h1>ブルーシールド・リスクアドバイザー</h1>
       <p class="tagline">製品安全・品質不正・リコール対応に特化したエキスパートチャット。</p>
-      <p class="lead">Render の環境変数に <code>GOOGLE_API_KEY</code> を設定すると、Gemini 1.5 Flash が高度な助言を提供します。認証後に相談内容を入力してください。</p>
+      <p class="lead">Render の環境変数に <code>GOOGLE_API_KEY</code> と必要に応じて <code>GOOGLE_GEMINI_MODEL</code> を設定すると、Gemini Flash 最新モデルが高度な助言を提供します。認証後に相談内容を入力してください。</p>
       <p class="security-note">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 10.75c-.69 0-1.25-.56-1.25-1.25V7.5c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25v3c0 .69-.56 1.25-1.25 1.25Zm1.5 4.75h-3c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3c.41 0 .75.34.75.75s-.34.75-.75.75Z"/></svg>
         本システムは Basic 認証下で動作し、会話内容はサーバー内で Gemini API にのみ送信されます。
@@ -275,7 +275,7 @@
       </div>
       <div class="status-bar" id="status-bar" role="status">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>
-        Gemini API キーが未設定の場合、このチャットは利用できません。環境変数 <code>GOOGLE_API_KEY</code> を設定してください。
+        Gemini API キーが未設定の場合、このチャットは利用できません。環境変数 <code>GOOGLE_API_KEY</code> を設定のうえ、必要なら <code>GOOGLE_GEMINI_MODEL</code> に <code>gemini-2.5-flash-latest</code> を指定してください。
       </div>
       <form id="chat-form" autocomplete="off">
         <label class="sr-only" for="chat-input">メッセージを入力</label>
