@@ -326,8 +326,7 @@
       const data = await response.json();
       const fallbackMessage = "回答を取得できませんでした。時間をおいて再試行してください。";
       const rawReply = removeFormalPreface((data.reply || fallbackMessage).trim());
-      const { text: limitedReply, truncated } = limitMarkdown(rawReply, 6000);
-      const displayHtml = formatReply(limitedReply, { truncated });
+      const displayHtml = formatReply(rawReply);
       const statusMessage = data.notice || "Gemini モデルから回答しました。";
 
       thinking.classList.remove("thinking");
@@ -385,4 +384,3 @@
   addMessage(formatReply(welcome), "bot", { isHtml: true });
   conversation.push({ role: "model", text: welcome });
 })();
-
