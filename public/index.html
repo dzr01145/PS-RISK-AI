@@ -313,6 +313,67 @@
       border: 0;
     }
 
+    .drawer-toggle {
+      display: none;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: linear-gradient(135deg, #1767c1, #1aa8b8);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(23, 103, 193, 0.28);
+      z-index: 20;
+    }
+
+    @media (max-width: 920px) {
+      .drawer-toggle {
+        display: block;
+      }
+      .body {
+        grid-template-columns: 1fr;
+      }
+      .chat-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .guide-panel {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100%;
+        width: min(320px, 80vw);
+        max-width: 360px;
+        z-index: 10;
+        transition: transform 0.3s ease;
+        transform: translateX(100%);
+        box-shadow: -20px 0 45px rgba(0, 0, 0, 0.24);
+        overflow-y: auto;
+      }
+      .guide-panel.open {
+        transform: translateX(0);
+        right: 0;
+      }
+      .guide-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(9, 21, 34, 0.45);
+        opacity: 0;
+        pointerEvents: none;
+        transition: opacity 0.3s ease;
+        z-index: 9;
+      }
+      .guide-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+
     @media (max-width: 920px) {
       .body {
         grid-template-columns: 1fr;
@@ -364,6 +425,8 @@
       </div>
     </header>
     <div class="body">
+      <button type="button" class="drawer-toggle" id="drawer-toggle">メニュー</button>
+      <div class="guide-overlay" id="guide-overlay"></div>
       <section class="chat-panel">
         <div class="messages" id="messages" aria-live="polite"></div>
         <div class="status-bar" id="status-bar" role="status"></div>
@@ -373,7 +436,7 @@
           <button type="submit">送信</button>
         </form>
       </section>
-      <aside class="guide-panel">
+     <aside class="guide-panel">
         <section>
       <h2>想定ユースケース</h2>
           <ul>
@@ -431,7 +494,7 @@
       const addMessage = (text, role) => {
         const bubble = document.createElement('div');
         bubble.className = `bubble ${role}`;
-        bubble.textContent = text;
+        bubble.innerHTML = text;
         if (role === 'bot') {
           bubble.classList.add('bot');
         } else {
@@ -472,10 +535,13 @@
           }
 
           const data = await response.json();
-          let reply = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
+          let raw = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
+          let reply = formatReply(raw);
           let statusMessage = data.notice || 'Gemini モデルと接続しました。';
-          if (reply.length > 300) {
-            reply = reply.slice(0, 300).trimEnd() + '…';
+          const plain = stripHtml(reply);
+          if (plain.length > 300) {
+            const truncated = plain.slice(0, 300).trimEnd();
+            reply = formatPlainText(truncated + '…');
             statusMessage = '300文字以内に要約して表示しました。';
           }
 
@@ -514,6 +580,30 @@
         });
       });
 
+      const overlay = document.getElementById('guide-overlay');
+      const toggle = document.getElementById('drawer-toggle');
+      const guidePanel = document.querySelector('.guide-panel');
+
+      const closeDrawer = () => {
+        guidePanel.classList.remove('open');
+        overlay.classList.remove('visible');
+      };
+
+      const openDrawer = () => {
+        guidePanel.classList.add('open');
+        overlay.classList.add('visible');
+      };
+
+      toggle.addEventListener('click', () => {
+        if (guidePanel.classList.contains('open')) {
+          closeDrawer();
+        } else {
+          openDrawer();
+        }
+      });
+
+      overlay.addEventListener('click', closeDrawer);
+
       const welcome = '現在抱えている課題や状況をお知らせください。初動整理、法規制の確認、社内体制づくりまで幅広くサポートします。';
       addMessage(welcome, 'bot');
       conversation.push({ role: 'model', text: welcome });
@@ -521,3 +611,51 @@
   </script>
 </body>
 </html>
+      const stripHtml = (html) => html.replace(/<[^>]+>/g, '');
+
+      const formatPlainText = (text) => text
+        .split(/\n{2,}/)
+        .map((block) => `<p>${escapeHtml(block)}</p>`)
+        .join('');
+
+      const escapeHtml = (str) => str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+      const formatReply = (raw) => {
+        const lines = raw.split('\n').filter(Boolean);
+
+        const htmlParts = [];
+        lines.forEach((line) => {
+          if (/^#{1,6}\s/.test(line)) {
+            const level = line.match(/^#+/)[0].length;
+            const content = escapeHtml(line.replace(/^#{1,6}\s*/, ''));
+            htmlParts.push(`<h${Math.min(level + 1, 6)}>${content}</h${Math.min(level + 1, 6)}>`); // shift level for hierarchy
+          } else if (/^[-*]\s+/.test(line)) {
+            const content = escapeHtml(line.replace(/^[-*]\s+/, '').trim());
+            const last = htmlParts[htmlParts.length - 1];
+            if (last && last.startsWith('<ul>')) {
+              htmlParts[htmlParts.length - 1] = last.replace('</ul>', `<li>${content}</li></ul>`);
+            } else {
+              htmlParts.push(`<ul><li>${content}</li></ul>`);
+            }
+          } else if (/^\d+\.\s+/.test(line)) {
+            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
+            const last = htmlParts[htmlParts.length - 1];
+            if (last && last.startsWith('<ol>')) {
+              htmlParts[htmlParts.length - 1] = last.replace('</ol>', `<li>${content}</li></ol>`);
+            } else {
+              htmlParts.push(`<ol><li>${content}</li></ol>`);
+            }
+          } else if (/^---+$/.test(line.trim())) {
+            htmlParts.push('<hr>');
+          } else {
+            htmlParts.push(`<p>${escapeHtml(line)}</p>`);
+          }
+        });
+
+        return htmlParts.join('');
+      };
