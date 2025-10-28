@@ -67,7 +67,7 @@ const basicAuth = (req, res, next) => {
   return next();
 };
 
-app.get("/healthz", (req, res) => {
+app.get("/healthz", (_req, res) => {
   res.status(200).json({
     status: "ok",
     model: primaryModel,
@@ -81,7 +81,6 @@ app.head("/healthz", (_req, res) => {
 
 app.use(basicAuth);
 app.use(express.json());
-app.use(express.static(publicDir, { extensions: ["html"] }));
 
 const buildGeminiPayload = (history, message) => {
   const sanitizedHistory = Array.isArray(history) ? history : [];
@@ -98,7 +97,7 @@ const buildGeminiPayload = (history, message) => {
   });
 
   const systemPrompt = [
-    "あなたは「ブルーシールド・リスクカウンシル」という名称のエキスパートコンサルタントです。",
+    "あなたは『ブルーシールド・リスクカウンシル』という名称のエキスパートコンサルタントです。",
     "専門領域は製品安全、製造物責任（PL）、品質管理、品質不正対応、国内外のリコール実務です。",
     "落ち着いたビジネス日本語を用い、次の観点を含む構成で整理してください。",
     "1. 背景整理と課題の仮説",
@@ -215,6 +214,8 @@ app.post("/api/chat", async (req, res) => {
     });
   }
 });
+
+app.use(express.static(publicDir, { extensions: ["html"] }));
 
 app.get("*", (_req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
