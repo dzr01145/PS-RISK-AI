@@ -14,6 +14,13 @@ const apiKey = process.env.GOOGLE_API_KEY;
 const geminiModel = process.env.GOOGLE_GEMINI_MODEL || 'gemini-2.5-flash-latest';
 const fallbackGeminiModel = process.env.GOOGLE_GEMINI_FALLBACK_MODEL || 'gemini-1.5-flash-latest';
 
+const isHealthCheckRequest = (req) => {
+  const userAgent = req.headers['user-agent'] || '';
+  return req.path === '/healthz'
+    || req.headers['x-render-health-check'] === 'true'
+    || userAgent.includes('Render/health-check');
+};
+
 const timingSafeEqual = (a, b) => {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
   const aBuffer = Buffer.from(a, 'utf8');
@@ -28,6 +35,9 @@ const demandAuth = (res) => {
 };
 
 const basicAuth = (req, res, next) => {
+  if (isHealthCheckRequest(req)) {
+    return next();
+  }
   const header = req.headers.authorization;
   if (!header || !header.startsWith('Basic ')) {
     return demandAuth(res);
@@ -51,6 +61,18 @@ const basicAuth = (req, res, next) => {
   return next();
 };
 
+app.get('/healthz', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    model: geminiModel,
+    fallbackModel: fallbackGeminiModel
+  });
+});
+
+app.head('/healthz', (req, res) => {
+  res.status(200).end();
+});
+
 app.use(basicAuth);
 app.use(express.json());
 app.use(express.static(publicDir, { extensions: ['html'] }));
@@ -72,10 +94,10 @@ const buildGeminiRequest = (history, message) => {
   const systemPrompt = [
     'あなたは「ブルーシールド・リスクアドバイザー」という名称のエキスパートコンサルタントです。',
     '専門領域は製品安全、製造物責任（PL）、品質管理、品質不正対応、国内外のリコール実務です。',
-    '丁寧で落ち着いたビジネス日本語を使い、',
-    '1) 相談内容の背景整理、2) 想定されるリスクや関連法規、3) 具体的な対応策・チェック項目、4) 次に検討すべきアクション',
-    'を明確に提示してください。可能な範囲で箇条書きも活用します。',
-    '会話の最後には状況把握に役立つフォローアップ質問を一つ添えてください。'
+    '落ち着いたビジネス日本語を用い、',
+    '1) 相談内容の背景整理、2) 想定リスクと関連法規、3) 具体的な対応策とチェック項目、4) 次に検討すべきアクション',
+    'を明確に提示してください。必要に応じて箇条書きを活用し、実務に役立つ視点を添えます。',
+    '回答の最後には状況把握に役立つフォローアップ質問を一つ添えてください。'
   ].join('\n');
 
   return {
@@ -105,7 +127,6 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent`;
   const payload = JSON.stringify(buildGeminiRequest(history, message));
 
   const callGemini = async (model) => {
@@ -130,7 +151,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     let primaryResult = await callGemini(geminiModel);
-    let modelUsed = geminiModel;
+    let activeModel = geminiModel;
     let fallbackNotice;
 
     if (!primaryResult.ok && primaryResult.status === 404 && geminiModel !== fallbackGeminiModel) {
@@ -138,7 +159,7 @@ app.post('/api/chat', async (req, res) => {
       const fallbackResult = await callGemini(fallbackGeminiModel);
       if (fallbackResult.ok) {
         primaryResult = fallbackResult;
-        modelUsed = fallbackGeminiModel;
+        activeModel = fallbackGeminiModel;
         fallbackNotice = `指定モデル ${geminiModel} が見つからなかったため、${fallbackGeminiModel} で応答しました。`;
       } else {
         primaryResult.detail += `\nFallback attempt (${fallbackGeminiModel}) also failed: ${fallbackResult.detail}`;
@@ -173,7 +194,7 @@ app.post('/api/chat', async (req, res) => {
 
     return res.json({
       reply,
-      notice: fallbackNotice || `${primaryResult.model || modelUsed} で応答しました。`
+      notice: fallbackNotice || `${primaryResult.model || activeModel} で応答しました。`
     });
   } catch (error) {
     return res.status(500).json({
