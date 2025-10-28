@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>あかねチャットボット</title>
+  <title>ブルーシールド・リスクアドバイザー</title>
   <style>
     :root {
       font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
       line-height: 1.6;
       color-scheme: light dark;
-      --akane-primary: #c81d25;
-      --akane-primary-soft: #fde5e7;
-      --akane-surface: rgba(255, 255, 255, 0.94);
-      --akane-text-strong: #2c1813;
-      --akane-text-soft: #7a1218;
-      --akane-border: rgba(200, 29, 37, 0.18);
+      --akane-primary: #115cbd;
+      --akane-primary-soft: #eff5ff;
+      --akane-surface: rgba(250, 253, 255, 0.97);
+      --akane-text-strong: #13253f;
+      --akane-text-soft: #1f3c63;
+      --akane-border: rgba(35, 98, 173, 0.18);
     }
     * {
       box-sizing: border-box;
@@ -27,15 +27,15 @@
       align-items: center;
       padding: 2rem 1rem;
       background:
-        radial-gradient(circle at top, rgba(255, 139, 139, 0.25), transparent 60%),
-        linear-gradient(120deg, #fff5f5, #ffe6e6);
+        radial-gradient(circle at top, rgba(40, 120, 205, 0.22), transparent 55%),
+        linear-gradient(120deg, #f4f9ff, #e5f0ff);
       color: var(--akane-text-strong);
     }
     main {
       width: min(880px, 96vw);
       background: var(--akane-surface);
       border-radius: 28px;
-      box-shadow: 0 30px 65px rgba(178, 34, 34, 0.18);
+      box-shadow: 0 30px 65px rgba(22, 72, 140, 0.18);
       backdrop-filter: blur(10px);
       overflow: hidden;
       display: flex;
@@ -45,7 +45,7 @@
     header {
       padding: clamp(1.6rem, 4vw, 2.6rem);
       border-bottom: 1px solid var(--akane-border);
-      background: linear-gradient(135deg, rgba(200, 29, 37, 0.12), rgba(254, 140, 148, 0.12));
+      background: linear-gradient(135deg, rgba(17, 92, 189, 0.12), rgba(88, 151, 226, 0.12));
     }
     h1 {
       margin: 0;
@@ -66,7 +66,7 @@
     .security-note {
       margin-top: 0.8rem;
       font-size: 0.85rem;
-      color: rgba(122, 18, 24, 0.72);
+      color: rgba(31, 60, 99, 0.72);
       display: flex;
       gap: 0.5rem;
       align-items: center;
@@ -105,8 +105,8 @@
       border-bottom-right-radius: 8px;
     }
     .bubble.bot {
-      background: #fff4f4;
-      border: 1px solid rgba(200, 29, 37, 0.2);
+      background: #ffffff;
+      border: 1px solid rgba(35, 98, 173, 0.18);
       color: var(--akane-text-soft);
       margin-right: auto;
       border-bottom-left-radius: 8px;
@@ -115,7 +115,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: rgba(122, 18, 24, 0.85);
+      color: rgba(31, 60, 99, 0.85);
     }
     .bubble.bot.thinking::after {
       content: "";
@@ -136,8 +136,8 @@
       padding: 0.75rem 1.6rem;
       font-size: 0.9rem;
       border-top: 1px solid var(--akane-border);
-      color: rgba(122, 18, 24, 0.85);
-      background: rgba(255, 255, 255, 0.7);
+      color: rgba(31, 60, 99, 0.88);
+      background: rgba(255, 255, 255, 0.76);
       display: flex;
       align-items: center;
       gap: 0.65rem;
@@ -148,12 +148,12 @@
       flex-shrink: 0;
     }
     .status-bar.error {
-      color: #b42318;
-      background: rgba(255, 237, 232, 0.8);
+      color: #af2a2a;
+      background: rgba(255, 235, 235, 0.9);
     }
     .status-bar.success {
-      color: #1b6d2f;
-      background: rgba(226, 248, 233, 0.9);
+      color: #136c3b;
+      background: rgba(229, 247, 238, 0.94);
     }
     form {
       display: flex;
@@ -164,18 +164,18 @@
     }
     input[type="text"] {
       flex: 1;
-      border: 1px solid rgba(200, 29, 37, 0.35);
+      border: 1px solid rgba(17, 92, 189, 0.32);
       border-radius: 999px;
       padding: 0.95rem 1.3rem;
       font-size: 1rem;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       color: inherit;
       transition: border 0.2s ease, box-shadow 0.2s ease;
     }
     input[type="text"]:focus {
       outline: none;
       border-color: var(--akane-primary);
-      box-shadow: 0 0 0 4px rgba(200, 29, 37, 0.2);
+      box-shadow: 0 0 0 4px rgba(17, 92, 189, 0.22);
     }
     button {
       border: none;
@@ -190,7 +190,7 @@
     }
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 20px rgba(200, 29, 37, 0.24);
+      box-shadow: 0 12px 20px rgba(17, 92, 189, 0.24);
     }
     button:disabled {
       cursor: not-allowed;
@@ -202,21 +202,21 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.6rem;
-      background: rgba(255, 255, 255, 0.75);
-      border-top: 1px solid rgba(200, 29, 37, 0.1);
+      background: rgba(247, 250, 255, 0.82);
+      border-top: 1px solid rgba(17, 92, 189, 0.08);
     }
     .suggestion {
-      border: 1px solid rgba(200, 29, 37, 0.25);
+      border: 1px solid rgba(17, 92, 189, 0.25);
       border-radius: 999px;
       padding: 0.55rem 1rem;
-      background: rgba(200, 29, 37, 0.05);
+      background: rgba(17, 92, 189, 0.06);
       color: var(--akane-text-soft);
       font-size: 0.92rem;
       cursor: pointer;
       transition: background 0.2s ease, transform 0.2s ease;
     }
     .suggestion:hover {
-      background: rgba(200, 29, 37, 0.15);
+      background: rgba(17, 92, 189, 0.16);
       transform: translateY(-1px);
     }
     .sr-only {
@@ -257,25 +257,25 @@
 <body>
   <main>
     <header>
-      <h1>あかねチャットボット</h1>
-      <p class="tagline">気軽に話せるミニアシスタント。Google Generative AI と連携して多彩に応答します。</p>
-      <p class="lead">Render の環境変数に <code>GOOGLE_API_KEY</code> を設定すると、Gemini 1.5 Flash が会話をサポートします。キーが無い場合は内蔵の簡易応答で対応します。</p>
+      <h1>ブルーシールド・リスクアドバイザー</h1>
+      <p class="tagline">製品安全・品質不正・リコール対応に特化したエキスパートチャット。</p>
+      <p class="lead">Render の環境変数に <code>GOOGLE_API_KEY</code> を設定すると、Gemini 1.5 Flash が高度な助言を提供します。認証後に相談内容を入力してください。</p>
       <p class="security-note">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 10.75c-.69 0-1.25-.56-1.25-1.25V7.5c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25v3c0 .69-.56 1.25-1.25 1.25Zm1.5 4.75h-3c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3c.41 0 .75.34.75.75s-.34.75-.75.75Z"/></svg>
-        このページは Basic 認証で保護され、会話内容はサーバー内でのみ処理されます。
+        本システムは Basic 認証下で動作し、会話内容はサーバー内で Gemini API にのみ送信されます。
       </p>
     </header>
     <div class="chat-wrapper">
       <section class="messages" id="messages" aria-live="polite"></section>
       <div class="suggestions" id="suggestions" aria-label="会話のきっかけ">
-        <button type="button" class="suggestion" data-message="今日のおすすめの過ごし方を教えて。">今日のおすすめの過ごし方</button>
-        <button type="button" class="suggestion" data-message="最近のテクノロジーの面白い話題は？">テクノロジーの話題</button>
-        <button type="button" class="suggestion" data-message="集中力を高めるちょっとしたコツが知りたい。">集中力アップのコツ</button>
-        <button type="button" class="suggestion" data-message="気分転換のアイデアをいくつか提案して。">気分転換のアイデア</button>
+        <button type="button" class="suggestion" data-message="海外向け製品のリコール手順の整理を手伝ってほしい。">海外リコール手順の整理</button>
+        <button type="button" class="suggestion" data-message="品質不正の兆候を早期に捉える仕組みを検討したい。">品質不正の予兆管理</button>
+        <button type="button" class="suggestion" data-message="製造物責任のリスク評価フレームワークを教えて。">PLリスク評価のフレームワーク</button>
+        <button type="button" class="suggestion" data-message="消費者庁への報告フロー構築で留意すべき点は？">行政報告フローの留意点</button>
       </div>
       <div class="status-bar" id="status-bar" role="status">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>
-        API キーが設定されていない場合はシンプルな内蔵応答で返答します。
+        Gemini API キーが未設定の場合、このチャットは利用できません。環境変数 <code>GOOGLE_API_KEY</code> を設定してください。
       </div>
       <form id="chat-form" autocomplete="off">
         <label class="sr-only" for="chat-input">メッセージを入力</label>
@@ -395,7 +395,7 @@
         });
       });
 
-      const welcome = 'こんにちは、私は「あかねチャットボット」です。話題はお任せください。気になることを自由に聞いてみてくださいね。';
+      const welcome = 'ようこそ。ブルーシールド・リスクアドバイザーです。製品安全、品質管理、リコール戦略など幅広くご相談ください。まずは状況や課題を教えてください。';
       addMessage(welcome, 'bot');
       conversation.push({ role: 'model', text: welcome });
     })();

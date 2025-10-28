@@ -67,7 +67,14 @@ const buildGeminiRequest = (history, message) => {
     parts: [{ text: message }]
   });
 
-  const systemPrompt = 'あなたは「あかねチャットボット」です。丁寧で親しみやすい日本語で応答し、ユーザーの依頼内容を要約しつつ、具体的な提案や補足情報も提供してください。必要に応じて箇条書きも使い、会話が広がるフォローアップの質問を入れてください。';
+  const systemPrompt = [
+    'あなたは「ブルーシールド・リスクアドバイザー」という名称のエキスパートコンサルタントです。',
+    '専門領域は製品安全、製造物責任（PL）、品質管理、品質不正対応、国内外のリコール実務です。',
+    '丁寧で落ち着いたビジネス日本語を使い、',
+    '1) 相談内容の背景整理、2) 想定されるリスクや関連法規、3) 具体的な対応策・チェック項目、4) 次に検討すべきアクション',
+    'を明確に提示してください。可能な範囲で箇条書きも活用します。',
+    '会話の最後には状況把握に役立つフォローアップ質問を一つ添えてください。'
+  ].join('\n');
 
   return {
     contents,
@@ -84,32 +91,6 @@ const buildGeminiRequest = (history, message) => {
   };
 };
 
-const fallbackReply = (message) => {
-  const text = message.trim();
-  if (!text) {
-    return '何かお話ししたいことはありますか？思いつかない時は「おすすめ」や「気分転換」などと聞いてみてください。';
-  }
-  if (/おすすめ|レコメンド|提案/.test(text)) {
-    return [
-      '気分転換には短い散歩やストレッチがおすすめです。',
-      '少し時間があるなら、今日良かったことを2つメモしてみませんか？'
-    ].join('\n');
-  }
-  if (/疲れ|休み|リラックス/.test(text)) {
-    return 'お疲れさまです。肩や首を回して血行を良くしたり、目を閉じて深呼吸を3回してみるとスッキリしますよ。';
-  }
-  if (/集中|勉強|仕事/.test(text)) {
-    return '集中のコツは「25分作業 + 5分休憩」のポモドーロ法がおすすめです。タスクを細かく分けてみましょう。';
-  }
-  if (/予定|スケジュール|計画/.test(text)) {
-    return '今日の予定を箇条書きにして優先順位をつけてみませんか？終わったらチェックしていくと達成感が得られます。';
-  }
-  if (/天気|外/.test(text)) {
-    return '詳しい天気はお住まいの地域の予報をご確認ください。服装や持ち物で調整することも忘れずに。';
-  }
-  return '面白い話題ですね！もう少し詳しく教えていただけたら、できる限りお手伝いします。';
-};
-
 app.post('/api/chat', async (req, res) => {
   const { message, history } = req.body || {};
   if (typeof message !== 'string' || !message.trim()) {
@@ -117,9 +98,8 @@ app.post('/api/chat', async (req, res) => {
   }
 
   if (!apiKey) {
-    return res.json({
-      reply: fallbackReply(message),
-      notice: 'GOOGLE_API_KEY が設定されていないため、簡易応答モードで返答しました。'
+    return res.status(503).json({
+      error: 'GOOGLE_API_KEY が設定されていません。Render の環境変数にキーを登録してください。'
     });
   }
 
