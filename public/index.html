@@ -9,15 +9,17 @@
       color-scheme: light dark;
       font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
       line-height: 1.6;
-      --bg-main: linear-gradient(130deg, #0b1e33 0%, #15497a 55%, #1f70a3 100%);
-      --panel: rgba(255, 255, 255, 0.94);
-      --border: rgba(24, 73, 126, 0.28);
-      --blue: #1767c1;
-      --blue-soft: rgba(23, 103, 193, 0.09);
+      --shell-width: min(1080px, 96vw);
+      --drawer-width: min(360px, 84vw);
+      --primary: #1767c1;
+      --primary-soft: rgba(23, 103, 193, 0.08);
       --accent: #1aa8b8;
-      --text-strong: #123049;
-      --text-soft: #245c83;
-      --shadow: 0 32px 65px rgba(13, 28, 52, 0.28);
+      --surface: rgba(255, 255, 255, 0.95);
+      --surface-soft: rgba(246, 250, 255, 0.92);
+      --border: rgba(24, 73, 126, 0.18);
+      --text-strong: #11293f;
+      --text-soft: #2b5a80;
+      --shadow-lg: 0 30px 60px rgba(12, 32, 58, 0.28);
     }
 
     * {
@@ -30,64 +32,66 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: clamp(1.4rem, 3vw, 2.4rem);
-      background: var(--bg-main);
+      padding: clamp(1.2rem, 3vw, 2.6rem);
+      background:
+        radial-gradient(circle at top left, rgba(26, 150, 204, 0.28), transparent 55%),
+        linear-gradient(130deg, #0a1c31 0%, #174a7c 52%, #1f6da5 100%);
       color: var(--text-strong);
     }
 
     main {
-      width: min(960px, 96vw);
-      display: grid;
-      gap: 0;
-      background: var(--panel);
+      width: var(--shell-width);
+      background: var(--surface);
       border-radius: 28px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-lg);
       border: 1px solid rgba(255, 255, 255, 0.4);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      position: relative;
     }
 
     header {
-      padding: clamp(1.8rem, 4vw, 2.4rem);
-      background: radial-gradient(circle at top left, rgba(23, 103, 193, 0.2), transparent 60%);
+      padding: clamp(1.8rem, 4vw, 2.6rem);
+      background: radial-gradient(circle at top left, rgba(22, 103, 193, 0.18), transparent 60%);
       border-bottom: 1px solid var(--border);
       text-align: center;
     }
 
     h1 {
       margin: 0;
-      font-weight: 700;
       font-size: clamp(2.2rem, 5vw, 3rem);
-      color: var(--blue);
+      font-weight: 700;
       letter-spacing: 0.08em;
+      color: var(--primary);
     }
 
     .lead {
-      margin: 0.4rem 0 0;
+      margin: 0.5rem 0 0;
       font-size: clamp(1.05rem, 2.6vw, 1.25rem);
-      color: var(--text-soft);
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
     }
 
     .badge-row {
+      margin-top: 1.2rem;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
+      gap: 0.65rem;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
       padding: 0.45rem 1rem;
       border-radius: 999px;
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      color: var(--primary);
       font-size: 0.9rem;
-      letter-spacing: 0.03em;
-      color: var(--blue);
-      background: var(--blue-soft);
-      border: 1px solid rgba(23, 103, 193, 0.18);
     }
 
     .badge svg {
@@ -96,75 +100,105 @@
       fill: currentColor;
     }
 
-    .body {
+    .workspace {
       display: grid;
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       min-height: clamp(520px, 70vh, 640px);
+      position: relative;
+    }
+
+    .drawer-toggle {
+      display: none;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #1767c1, #1aa8b8);
+      box-shadow: 0 12px 24px rgba(23, 103, 193, 0.28);
+      cursor: pointer;
+      z-index: 12;
     }
 
     .chat-panel {
       display: grid;
       grid-template-rows: minmax(0, 1fr) auto auto;
       border-right: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.98);
     }
 
     .messages {
-      padding: clamp(1.4rem, 3vw, 2rem);
+      padding: clamp(1.4rem, 3vw, 2.1rem);
       overflow-y: auto;
-      scroll-behavior: smooth;
       display: flex;
       flex-direction: column;
-      gap: 1.1rem;
-      background: linear-gradient(180deg, rgba(23, 103, 193, 0.06) 0%, transparent 45%);
+      gap: 1.2rem;
+      background: linear-gradient(180deg, rgba(23, 103, 193, 0.08) 0%, transparent 50%);
     }
 
     .bubble {
       max-width: min(78%, 420px);
       padding: 1rem 1.25rem;
-      border-radius: 18px;
-      line-height: 1.75;
+      border-radius: 20px;
       box-shadow: 0 18px 32px rgba(16, 37, 64, 0.14);
+      line-height: 1.7;
       word-break: break-word;
-      white-space: pre-wrap;
     }
 
     .bubble.user {
       margin-left: auto;
-      color: #fff;
       background: linear-gradient(135deg, #1767c1, #1aa8b8);
+      color: #fff;
       border-bottom-right-radius: 6px;
     }
 
     .bubble.bot {
       margin-right: auto;
       background: #ffffff;
-      border: 1px solid rgba(23, 103, 193, 0.18);
+      border: 1px solid var(--border);
       color: var(--text-soft);
       border-bottom-left-radius: 6px;
     }
 
-    .bubble.bot.thinking::after {
-      content: "•••";
-      margin-left: 0.8rem;
-      letter-spacing: 0.22em;
-      opacity: 0.6;
-      animation: pulse 1.1s infinite ease-in-out;
+    .bubble.bot h2,
+    .bubble.bot h3,
+    .bubble.bot h4,
+    .bubble.bot h5,
+    .bubble.bot h6 {
+      margin: 0.4rem 0 0.3rem;
+      font-size: 1.05rem;
+      color: var(--primary);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; transform: translateY(0); }
-      50% { opacity: 0.8; transform: translateY(-1px); }
+    .bubble.bot h2:first-child,
+    .bubble.bot h3:first-child {
+      margin-top: 0;
+    }
+
+    .bubble.bot ul,
+    .bubble.bot ol {
+      padding-left: 1.2rem;
+      margin: 0.3rem 0;
+    }
+
+    .bubble.bot p {
+      margin: 0.3rem 0;
     }
 
     .status-bar {
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      padding: 0.8rem 1.6rem;
-      font-size: 0.9rem;
+      padding: 0.9rem 1.6rem;
       border-top: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.85);
+      font-size: 0.92rem;
       color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.92);
+      min-height: 3.1rem;
     }
 
     .status-bar svg {
@@ -173,110 +207,93 @@
       flex-shrink: 0;
     }
 
-    .status-bar.error {
-      color: #c0392b;
-      background: rgba(255, 237, 233, 0.92);
-      border-top-color: rgba(192, 57, 43, 0.18);
+    .status-bar.success {
+      background: rgba(229, 247, 238, 0.92);
+      color: #1f7a4d;
     }
 
-    .status-bar.success {
-      color: #1f7a4d;
-      background: rgba(230, 249, 240, 0.92);
-      border-top-color: rgba(31, 122, 77, 0.18);
+    .status-bar.error {
+      background: rgba(255, 237, 232, 0.92);
+      color: #c23a2a;
     }
 
     form {
       display: flex;
       gap: 0.9rem;
-      padding: clamp(1rem, 2.5vw, 1.4rem);
+      padding: clamp(1rem, 2.6vw, 1.5rem);
       border-top: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.96);
     }
 
     input[type="text"] {
       flex: 1;
-      border: 1px solid rgba(23, 103, 193, 0.35);
-      border-radius: 999px;
       padding: 1rem 1.25rem;
       font-size: 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 103, 193, 0.35);
       transition: border 0.2s ease, box-shadow 0.2s ease;
-      background: rgba(255, 255, 255, 0.98);
+      background: rgba(255, 255, 255, 0.96);
       color: var(--text-strong);
     }
 
     input[type="text"]:focus {
       outline: none;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(23, 103, 193, 0.18);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(23, 103, 193, 0.2);
     }
 
-    button {
+    button[type="submit"] {
       border: none;
       border-radius: 999px;
-      padding: 0.95rem 1.9rem;
+      padding: 1rem 2.1rem;
+      background: linear-gradient(135deg, #1767c1, #1aa8b8);
+      color: #fff;
       font-size: 1rem;
       font-weight: 600;
-      color: #fff;
-      background: linear-gradient(135deg, #1767c1, #1aa8b8);
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
       box-shadow: 0 12px 24px rgba(23, 103, 193, 0.28);
     }
 
-    button:hover {
+    button[type="submit"]:hover {
       transform: translateY(-1px);
-      box-shadow: 0 16px 28px rgba(23, 103, 193, 0.32);
+      box-shadow: 0 18px 30px rgba(23, 103, 193, 0.32);
     }
 
-    button:disabled {
+    button[type="submit"]:disabled {
       cursor: not-allowed;
       background: rgba(23, 103, 193, 0.5);
       box-shadow: none;
     }
 
-    .guide-panel {
+    .drawer {
       padding: clamp(1.6rem, 3vw, 2.4rem);
+      background: var(--surface-soft);
       display: flex;
       flex-direction: column;
       gap: 1.8rem;
-      background: rgba(246, 250, 255, 0.84);
     }
 
-    .guide-panel h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: var(--blue);
-      letter-spacing: 0.05em;
-      border-left: 4px solid var(--accent);
-      padding-left: 0.75rem;
-    }
-
-    .guide-panel section {
+    .drawer section {
       display: grid;
       gap: 0.7rem;
     }
 
-    .guide-panel ul {
+    .drawer h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      border-left: 4px solid var(--accent);
+      padding-left: 0.75rem;
+    }
+
+    .drawer ul {
       margin: 0;
       padding-left: 1.1rem;
       display: grid;
       gap: 0.4rem;
       color: var(--text-soft);
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .chip {
-      border-radius: 12px;
-      padding: 0.55rem 0.9rem;
-      background: rgba(23, 103, 193, 0.1);
-      color: var(--text-soft);
-      font-size: 0.9rem;
-      border: 1px solid rgba(23, 103, 193, 0.15);
     }
 
     .suggestions {
@@ -287,17 +304,17 @@
     .suggestion-btn {
       border: 1px solid rgba(23, 103, 193, 0.22);
       border-radius: 12px;
-      padding: 0.75rem 0.95rem;
+      padding: 0.8rem 1.05rem;
       text-align: left;
       font-size: 0.95rem;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.94);
       color: var(--text-soft);
       cursor: pointer;
       transition: border 0.2s ease, box-shadow 0.2s ease;
     }
 
     .suggestion-btn:hover {
-      border-color: var(--blue);
+      border-color: var(--primary);
       box-shadow: 0 12px 20px rgba(23, 103, 193, 0.18);
     }
 
@@ -313,93 +330,68 @@
       border: 0;
     }
 
-    .drawer-toggle {
-      display: none;
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: linear-gradient(135deg, #1767c1, #1aa8b8);
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 12px 24px rgba(23, 103, 193, 0.28);
-      z-index: 20;
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 21, 34, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 8;
     }
 
-    @media (max-width: 920px) {
+    .drawer-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        border-radius: 22px;
+      }
+    }
+
+    @media (max-width: 960px) {
       .drawer-toggle {
         display: block;
       }
-      .body {
+
+      .workspace {
         grid-template-columns: 1fr;
       }
+
       .chat-panel {
         border-right: none;
         border-bottom: 1px solid var(--border);
       }
-      .guide-panel {
+
+      .drawer {
         position: fixed;
         top: 0;
         right: -100%;
-        height: 100%;
-        width: min(320px, 80vw);
+        height: 100vh;
+        width: var(--drawer-width);
         max-width: 360px;
-        z-index: 10;
         transition: transform 0.3s ease;
         transform: translateX(100%);
-        box-shadow: -20px 0 45px rgba(0, 0, 0, 0.24);
+        box-shadow: -22px 0 45px rgba(0, 0, 0, 0.24);
         overflow-y: auto;
+        z-index: 9;
       }
-      .guide-panel.open {
+
+      .drawer.open {
         transform: translateX(0);
         right: 0;
       }
-      .guide-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(9, 21, 34, 0.45);
-        opacity: 0;
-        pointerEvents: none;
-        transition: opacity 0.3s ease;
-        z-index: 9;
-      }
-      .guide-overlay.visible {
-        opacity: 1;
-        pointer-events: auto;
-      }
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 600px) {
+      form {
+        flex-direction: column;
+      }
 
-    @media (max-width: 920px) {
-      .body {
-        grid-template-columns: 1fr;
-      }
-      .chat-panel {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-    }
-
-    @media (max-width: 620px) {
-      body {
-        padding: 0.6rem;
-      }
-      main {
-        border-radius: 0;
+      button[type="submit"] {
         width: 100%;
-      }
-      .messages {
-        padding: 1.1rem;
-      }
-      button {
-        padding: 0.9rem 1.4rem;
-      }
-      .badge-row {
-        gap: 0.4rem;
       }
     }
   </style>
@@ -411,34 +403,33 @@
       <p class="lead">― 製品安全・品質トラブルのAI相談 ―</p>
       <div class="badge-row">
         <span class="badge">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 9.97-4.99L12 2zm0 7.73L4.18 6.6 12 3.27l7.82 3.33L12 9.73zM12 13l-7.82-3.33.01 3.91L12 17l7.81-3.42v-3.91L12 13zM4.19 16.09 12 19.73l7.81-3.64v2.71L12 22l-7.81-3.2v-2.71z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 9.97-4.99L12 2zm0 7.73L4.18 6.6 12 3.27l7.82 3.33L12 9.73zM12 13l-7.82-3.33.01 3.91L12 17l7.81-3.42v-3.91L12 13zM4.19 16.09 12 19.73l7.81-3.64v2.71L12 22l-7.81-3.2v-2.71z"></path></svg>
           ISO/IEC 31000 規格リファレンス
         </span>
         <span class="badge">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3Zm0 11L4.24 9 12 5l7.76 4L12 14Zm-7 2H3v4h2v-4Zm4 0H7v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3Zm0 11L4.24 9 12 5l7.76 4L12 14Zm-7 2H3v4h2v-4Zm4 0H7v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Z"></path></svg>
           PL法・消費生活用製品安全法の実務
         </span>
         <span class="badge">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm1 17h-2v-2h2v2Zm0-4h-2V7h2v7Z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm1 17h-2v-2h2v2Zm0-4h-2V7h2v7Z"></path></svg>
           行政・海外当局対応のベストプラクティス
         </span>
       </div>
     </header>
-    <div class="body">
+    <div class="workspace">
       <button type="button" class="drawer-toggle" id="drawer-toggle">メニュー</button>
-      <div class="guide-overlay" id="guide-overlay"></div>
       <section class="chat-panel">
         <div class="messages" id="messages" aria-live="polite"></div>
         <div class="status-bar" id="status-bar" role="status"></div>
         <form id="chat-form" autocomplete="off">
-          <label class="sr-only" for="chat-input">メッセージを入力</label>
+          <label class="sr-only" for="chat-input">相談内容を入力</label>
           <input id="chat-input" type="text" name="message" placeholder="相談内容を入力..." required>
           <button type="submit">送信</button>
         </form>
       </section>
-     <aside class="guide-panel">
+      <aside class="drawer" id="guide-drawer">
         <section>
-      <h2>想定ユースケース</h2>
+          <h2>想定ユースケース</h2>
           <ul>
             <li>サプライヤー由来の品質不正疑義を受けた際の初動整理</li>
             <li>海外市場への自主回収を検討する際のマイルストーン設計</li>
@@ -449,15 +440,17 @@
         <section>
           <h2>クイック質問サンプル</h2>
           <div class="suggestions">
-            <button type="button" class="suggestion-btn" data-message="海外での重大事故に関する初動対応の全体像を整理したい。">海外事故発生時の初動対応</button>
-            <button type="button" class="suggestion-btn" data-message="品質不正の再発防止策を構築するためのステップを教えてほしい。">品質不正再発防止のフレーム</button>
-            <button type="button" class="suggestion-btn" data-message="PL訴訟を見据えた証拠保全と社内体制の注意点を知りたい。">PL訴訟対策の体制ポイント</button>
-            <button type="button" class="suggestion-btn" data-message="並行輸入品の安全リスク評価をどう行えばよいか？">並行輸入品のリスク評価</button>
+            <button type="button" class="suggestion-btn" data-message="海外で重大事故が発生した際の初動対応全体像を教えてください。">海外事故発生時の初動対応</button>
+            <button type="button" class="suggestion-btn" data-message="品質不正の再発防止策を構築するためのステップを整理してください。">品質不正再発防止のフレーム</button>
+            <button type="button" class="suggestion-btn" data-message="PL訴訟を見据えた証拠保全と社内体制づくりの要点を知りたいです。">PL訴訟対策の体制ポイント</button>
+            <button type="button" class="suggestion-btn" data-message="並行輸入品の安全リスク評価はどのように進めると良いでしょうか。">並行輸入品のリスク評価</button>
           </div>
         </section>
       </aside>
     </div>
   </main>
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
   <script>
     (() => {
       const messagesEl = document.getElementById('messages');
@@ -465,19 +458,100 @@
       const input = document.getElementById('chat-input');
       const statusBar = document.getElementById('status-bar');
       const suggestionButtons = document.querySelectorAll('.suggestion-btn');
+      const toggle = document.getElementById('drawer-toggle');
+      const guidePanel = document.getElementById('guide-drawer');
+      const overlay = document.getElementById('drawer-overlay');
 
       const conversation = [];
       let busy = false;
+
+      const stripHtml = (html) => html.replace(/<[^>]+>/g, '');
+
+      const escapeHtml = (str) => str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+      const formatPlainText = (text) => text
+        .split(/\n{2,}/)
+        .map((block) => `<p>${escapeHtml(block)}</p>`)
+        .join('');
+
+      const formatReply = (raw) => {
+        const lines = raw.split('\n').filter((line) => line.trim().length > 0);
+        const htmlParts = [];
+        let ulOpen = false;
+        let olOpen = false;
+
+        const closeLists = () => {
+          if (ulOpen) {
+            htmlParts.push('</ul>');
+            ulOpen = false;
+          }
+          if (olOpen) {
+            htmlParts.push('</ol>');
+            olOpen = false;
+          }
+        };
+
+        lines.forEach((line) => {
+          if (/^#{1,6}\s/.test(line)) {
+            closeLists();
+            const level = line.match(/^#+/)[0].length;
+            const content = escapeHtml(line.replace(/^#{1,6}\s*/, ''));
+            htmlParts.push(`<h${Math.min(level + 1, 6)}>${content}</h${Math.min(level + 1, 6)}>`); // ensure h2+
+            return;
+          }
+
+          if (/^[-*]\s+/.test(line)) {
+            if (!ulOpen) {
+              closeLists();
+              htmlParts.push('<ul>');
+              ulOpen = true;
+            }
+            const content = escapeHtml(line.replace(/^[-*]\s+/, '').trim());
+            htmlParts.push(`<li>${content}</li>`);
+            return;
+          }
+
+          if (/^\d+\.\s+/.test(line)) {
+            if (!olOpen) {
+              closeLists();
+              htmlParts.push('<ol>');
+              olOpen = true;
+            }
+            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
+            htmlParts.push(`<li>${content}</li>`);
+            return;
+          }
+
+          if (/^---+$/.test(line.trim())) {
+            closeLists();
+            htmlParts.push('<hr>');
+            return;
+          }
+
+          closeLists();
+          htmlParts.push(`<p>${escapeHtml(line)}</p>`);
+        });
+
+        closeLists();
+        return htmlParts.join('');
+      };
 
       const renderStatus = (text, variant = 'default') => {
         statusBar.textContent = '';
         statusBar.classList.remove('error', 'success');
         if (variant === 'error') statusBar.classList.add('error');
         if (variant === 'success') statusBar.classList.add('success');
+        if (!text) return;
 
         const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         icon.setAttribute('viewBox', '0 0 24 24');
         icon.setAttribute('aria-hidden', 'true');
+
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         if (variant === 'error') {
           path.setAttribute('d', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z');
@@ -486,15 +560,16 @@
         } else {
           path.setAttribute('d', 'M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z');
         }
+
         icon.appendChild(path);
         statusBar.appendChild(icon);
         statusBar.appendChild(document.createTextNode(text));
       };
 
-      const addMessage = (text, role) => {
+      const addMessage = (content, role, { isHtml = false } = {}) => {
         const bubble = document.createElement('div');
         bubble.className = `bubble ${role}`;
-        bubble.innerHTML = text;
+        bubble.innerHTML = isHtml ? content : escapeHtml(content).replace(/\n/g, '<br>');
         if (role === 'bot') {
           bubble.classList.add('bot');
         } else {
@@ -509,6 +584,16 @@
         busy = state;
         input.disabled = state;
         form.querySelector('button[type="submit"]').disabled = state;
+      };
+
+      const closeDrawer = () => {
+        guidePanel.classList.remove('open');
+        overlay.classList.remove('visible');
+      };
+
+      const openDrawer = () => {
+        guidePanel.classList.add('open');
+        overlay.classList.add('visible');
       };
 
       const sendMessage = async (rawText) => {
@@ -535,23 +620,24 @@
           }
 
           const data = await response.json();
-          let raw = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
-          let reply = formatReply(raw);
+          const rawReply = (data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim();
+          let displayHtml = formatReply(rawReply);
           let statusMessage = data.notice || 'Gemini モデルと接続しました。';
-          const plain = stripHtml(reply);
-          if (plain.length > 300) {
-            const truncated = plain.slice(0, 300).trimEnd();
-            reply = formatPlainText(truncated + '…');
+
+          const plainReply = stripHtml(displayHtml);
+          if (plainReply.length > 300) {
+            const truncated = plainReply.slice(0, 300).trimEnd();
+            displayHtml = formatReply(truncated + '…');
             statusMessage = '300文字以内に要約して表示しました。';
           }
 
           thinking.classList.remove('thinking');
-          thinking.textContent = reply;
-          conversation.push({ role: 'model', text: reply });
+          thinking.innerHTML = displayHtml;
+          conversation.push({ role: 'model', text: rawReply });
           renderStatus(statusMessage, 'success');
         } catch (error) {
           thinking.classList.remove('thinking');
-          thinking.textContent = 'エラーが発生しました。少し時間を空けて再試行してください。';
+          thinking.innerHTML = escapeHtml('エラーが発生しました。少し時間をおいて再試行してください。');
           renderStatus(error.message || '予期しないエラーが発生しました。', 'error');
         } finally {
           setBusy(false);
@@ -577,22 +663,9 @@
         button.addEventListener('click', () => {
           input.value = button.dataset.message;
           input.focus();
+          if (guidePanel.classList.contains('open')) closeDrawer();
         });
       });
-
-      const overlay = document.getElementById('guide-overlay');
-      const toggle = document.getElementById('drawer-toggle');
-      const guidePanel = document.querySelector('.guide-panel');
-
-      const closeDrawer = () => {
-        guidePanel.classList.remove('open');
-        overlay.classList.remove('visible');
-      };
-
-      const openDrawer = () => {
-        guidePanel.classList.add('open');
-        overlay.classList.add('visible');
-      };
 
       toggle.addEventListener('click', () => {
         if (guidePanel.classList.contains('open')) {
@@ -605,77 +678,9 @@
       overlay.addEventListener('click', closeDrawer);
 
       const welcome = '現在抱えている課題や状況をお知らせください。初動整理、法規制の確認、社内体制づくりまで幅広くサポートします。';
-      addMessage(welcome, 'bot');
+      addMessage(formatPlainText(welcome), 'bot', { isHtml: true });
       conversation.push({ role: 'model', text: welcome });
     })();
   </script>
 </body>
 </html>
-      const stripHtml = (html) => html.replace(/<[^>]+>/g, '');
-
-      const formatPlainText = (text) => text
-        .split(/\n{2,}/)
-        .map((block) => `<p>${escapeHtml(block)}</p>`)
-        .join('');
-
-      const escapeHtml = (str) => str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-
-      const formatReply = (raw) => {
-        const lines = raw.split('\n').filter(Boolean);
-
-        const htmlParts = [];
-        let ulOpen = false;
-        let olOpen = false;
-
-        const closeLists = () => {
-          if (ulOpen) {
-            htmlParts.push('</ul>');
-            ulOpen = false;
-          }
-          if (olOpen) {
-            htmlParts.push('</ol>');
-            olOpen = false;
-          }
-        };
-
-        lines.forEach((line) => {
-          if (/^#{1,6}\s/.test(line)) {
-            closeLists();
-            const level = line.match(/^#+/)[0].length;
-            const content = escapeHtml(line.replace(/^#{1,6}\s*/, ''));
-            const tagLevel = Math.min(level + 1, 6);
-            htmlParts.push(`<h${tagLevel}>${content}</h${tagLevel}>`);
-          } else if (/^[-*]\s+/.test(line)) {
-            if (!ulOpen) {
-              closeLists();
-              htmlParts.push('<ul>');
-              ulOpen = true;
-            }
-            const content = escapeHtml(line.replace(/^[-*]\s+/, '').trim());
-            htmlParts.push(`<li>${content}</li>`);
-          } else if (/^\d+\.\s+/.test(line)) {
-            if (!olOpen) {
-              closeLists();
-              htmlParts.push('<ol>');
-              olOpen = true;
-            }
-            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
-            htmlParts.push(`<li>${content}</li>`);
-          } else if (/^---+$/.test(line.trim())) {
-            closeLists();
-            htmlParts.push('<hr>');
-          } else {
-            closeLists();
-            htmlParts.push(`<p>${escapeHtml(line)}</p>`);
-          }
-        });
-
-        closeLists();
-
-        return htmlParts.join('');
-      };
