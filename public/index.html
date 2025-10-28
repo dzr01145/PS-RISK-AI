@@ -161,6 +161,7 @@
       background: #ffffff;
       border: 1px solid var(--border);
       color: var(--text-soft);
+      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
       border-bottom-left-radius: 6px;
     }
 
@@ -520,15 +521,57 @@
         .replace(/'/g, '&#39;');
 
       const renderInline = (text) => text
-        .split(/(\*\*[^*]+\*\*)/g)
+        .split(/(\*\*[\s\S]+?\*\*)/g)
         .map((segment) => {
-          const bold = segment.match(/^\*\*([^*]+)\*\*$/);
+          const bold = segment.match(/^\*\*([\s\S]+?)\*\*$/);
           if (bold) {
             return `<strong>${escapeHtml(bold[1].trim())}</strong>`;
           }
           return escapeHtml(segment);
         })
         .join('');
+
+      const limitMarkdown = (text, maxChars) => {
+        if (typeof text !== 'string' || text.length === 0 || maxChars <= 0) {
+          return { text: '', truncated: Boolean(text && text.length > 0) };
+        }
+
+        let visible = 0;
+        let index = 0;
+        let boldOpen = false;
+        let result = '';
+
+        while (index < text.length && visible < maxChars) {
+          if (text.startsWith('**', index)) {
+            result += '**';
+            boldOpen = !boldOpen;
+            index += 2;
+            continue;
+          }
+
+          const char = text[index];
+          result += char;
+          if (char !== '\r') {
+            visible += 1;
+          }
+          index += 1;
+        }
+
+        const truncated = index < text.length;
+        if (!truncated) {
+          return { text, truncated: false };
+        }
+
+        result = result.trimEnd();
+        if (!result.endsWith('...')) {
+          result += '...';
+        }
+        if (boldOpen) {
+          result += '**';
+        }
+
+        return { text: result, truncated: true };
+      };
 
       const formatPlainText = (text) => text
         .split(/\n{2,}/)
@@ -694,7 +737,8 @@
 
           const data = await response.json();
           const rawReply = removeFormalPreface((data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim());
-          let displayHtml = formatReply(rawReply);
+          const { text: limitedReply } = limitMarkdown(rawReply, 200);
+          let displayHtml = formatReply(limitedReply);
           let statusMessage = data.notice || 'Gemini モデルと接続しました。';
           thinking.classList.remove('thinking');
           thinking.innerHTML = displayHtml;
