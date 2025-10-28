@@ -629,33 +629,53 @@
         const lines = raw.split('\n').filter(Boolean);
 
         const htmlParts = [];
+        let ulOpen = false;
+        let olOpen = false;
+
+        const closeLists = () => {
+          if (ulOpen) {
+            htmlParts.push('</ul>');
+            ulOpen = false;
+          }
+          if (olOpen) {
+            htmlParts.push('</ol>');
+            olOpen = false;
+          }
+        };
+
         lines.forEach((line) => {
           if (/^#{1,6}\s/.test(line)) {
+            closeLists();
             const level = line.match(/^#+/)[0].length;
             const content = escapeHtml(line.replace(/^#{1,6}\s*/, ''));
-            htmlParts.push(`<h${Math.min(level + 1, 6)}>${content}</h${Math.min(level + 1, 6)}>`); // shift level for hierarchy
+            const tagLevel = Math.min(level + 1, 6);
+            htmlParts.push(`<h${tagLevel}>${content}</h${tagLevel}>`);
           } else if (/^[-*]\s+/.test(line)) {
+            if (!ulOpen) {
+              closeLists();
+              htmlParts.push('<ul>');
+              ulOpen = true;
+            }
             const content = escapeHtml(line.replace(/^[-*]\s+/, '').trim());
-            const last = htmlParts[htmlParts.length - 1];
-            if (last && last.startsWith('<ul>')) {
-              htmlParts[htmlParts.length - 1] = last.replace('</ul>', `<li>${content}</li></ul>`);
-            } else {
-              htmlParts.push(`<ul><li>${content}</li></ul>`);
-            }
+            htmlParts.push(`<li>${content}</li>`);
           } else if (/^\d+\.\s+/.test(line)) {
-            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
-            const last = htmlParts[htmlParts.length - 1];
-            if (last && last.startsWith('<ol>')) {
-              htmlParts[htmlParts.length - 1] = last.replace('</ol>', `<li>${content}</li></ol>`);
-            } else {
-              htmlParts.push(`<ol><li>${content}</li></ol>`);
+            if (!olOpen) {
+              closeLists();
+              htmlParts.push('<ol>');
+              olOpen = true;
             }
+            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
+            htmlParts.push(`<li>${content}</li>`);
           } else if (/^---+$/.test(line.trim())) {
+            closeLists();
             htmlParts.push('<hr>');
           } else {
+            closeLists();
             htmlParts.push(`<p>${escapeHtml(line)}</p>`);
           }
         });
+
+        closeLists();
 
         return htmlParts.join('');
       };
