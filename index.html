@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自己紹介</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.6;
+      background: #f5f5f5;
+      color: #222;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(16, 106, 213, 0.15), rgba(79, 209, 197, 0.15));
+    }
+    main {
+      width: min(720px, 90vw);
+      background: #fff;
+      padding: 3rem;
+      margin: 3rem 0;
+      border-radius: 18px;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.12);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: clamp(2.5rem, 4vw, 3.2rem);
+      color: #106ad5;
+    }
+    h2 {
+      margin-bottom: 0.6rem;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      color: #0b4b94;
+    }
+    p, li {
+      font-size: 1rem;
+    }
+    section + section {
+      margin-top: 2rem;
+    }
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    .tagline {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+    }
+    @media (max-width: 600px) {
+      main {
+        padding: 2rem;
+        margin: 2rem 0;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>山田 太郎</h1>
+      <p class="tagline">フロントエンドとデザインが好きなエンジニアです。</p>
+    </header>
+
+    <section>
+      <h2>プロフィール</h2>
+      <p>
+        東京都出身。ユーザー体験を大切にしながら、見た目と使いやすさを両立するプロダクト作りに取り組んでいます。
+        最近はアクセシビリティを意識したデザイン設計にも力を入れています。
+      </p>
+    </section>
+
+    <section>
+      <h2>スキル</h2>
+      <ul>
+        <li>TypeScript / React / Next.js を使ったフロントエンド開発</li>
+        <li>Figma でのUIデザインとプロトタイピング</li>
+        <li>ユーザビリティテストやヒアリングを通じた課題発見</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>好きなこと</h2>
+      <ul>
+        <li>コーヒーショップ巡りとラテアートの練習</li>
+        <li>インタラクションデザインの勉強会参加</li>
+        <li>休日にカメラを持って街を散策すること</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>今後挑戦したいこと</h2>
+      <p>
+        プロダクトの立ち上げフェーズから関わり、デザインシステム構築とチーム開発体制を整える挑戦をしてみたいです。
+      </p>
+    </section>
+
+    <section>
+      <h2>お問い合わせ</h2>
+      <p>
+        お仕事の相談や気軽な情報交換は
+        <a href="mailto:taro.yamada@example.com">taro.yamada@example.com</a>
+        までご連絡ください。
+      </p>
+    </section>
+  </main>
+</body>
+</html>
