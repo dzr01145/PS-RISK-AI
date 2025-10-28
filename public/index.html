@@ -165,6 +165,13 @@
       border-bottom-left-radius: 6px;
     }
 
+    .bubble.bot pre.reply-plain {
+      margin: 0;
+      font: inherit;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     .bubble.bot h2,
     .bubble.bot h3,
     .bubble.bot h4,
@@ -511,8 +518,6 @@
       const conversation = [];
       let busy = false;
 
-      const stripHtml = (html) => html.replace(/<[^>]+>/g, '');
-
       const escapeHtml = (str) => str
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -536,41 +541,12 @@
           return { text: '', truncated: Boolean(text && text.length > 0) };
         }
 
-        let visible = 0;
-        let index = 0;
-        let boldOpen = false;
-        let result = '';
-
-        while (index < text.length && visible < maxChars) {
-          if (text.startsWith('**', index)) {
-            result += '**';
-            boldOpen = !boldOpen;
-            index += 2;
-            continue;
-          }
-
-          const char = text[index];
-          result += char;
-          if (char !== '\r') {
-            visible += 1;
-          }
-          index += 1;
-        }
-
-        const truncated = index < text.length;
-        if (!truncated) {
+        if (text.length <= maxChars) {
           return { text, truncated: false };
         }
 
-        result = result.trimEnd();
-        if (!result.endsWith('...')) {
-          result += '...';
-        }
-        if (boldOpen) {
-          result += '**';
-        }
-
-        return { text: result, truncated: true };
+        const trimmed = text.slice(0, maxChars).trimEnd();
+        return { text: trimmed.endsWith('...') ? trimmed : `${trimmed}...`, truncated: true };
       };
 
       const formatPlainText = (text) => text
@@ -579,72 +555,8 @@
         .join('');
 
       const formatReply = (raw) => {
-        const lines = raw.split('\n').filter((line) => line.trim().length > 0);
-        const htmlParts = [];
-        let ulOpen = false;
-        let olOpen = false;
-
-        const closeLists = () => {
-          if (ulOpen) {
-            htmlParts.push('</ul>');
-            ulOpen = false;
-          }
-          if (olOpen) {
-            htmlParts.push('</ol>');
-            olOpen = false;
-          }
-        };
-
-        lines.forEach((line) => {
-          if (/^#{1,6}\s/.test(line)) {
-            closeLists();
-            const level = line.match(/^#+/)[0].length;
-            const content = escapeHtml(line.replace(/^#{1,6}\s*/, ''));
-            htmlParts.push(`<h${Math.min(level + 1, 6)}>${content}</h${Math.min(level + 1, 6)}>`); // ensure h2+
-            return;
-          }
-
-          if (/^[-*]\s+/.test(line)) {
-            if (!ulOpen) {
-              closeLists();
-              htmlParts.push('<ul>');
-              ulOpen = true;
-            }
-            const content = escapeHtml(line.replace(/^[-*]\s+/, '').trim());
-            htmlParts.push(`<li>${content}</li>`);
-            return;
-          }
-
-          if (/^\d+\.\s+/.test(line)) {
-            if (!olOpen) {
-              closeLists();
-              htmlParts.push('<ol>');
-              olOpen = true;
-            }
-            const content = escapeHtml(line.replace(/^\d+\.\s+/, '').trim());
-            htmlParts.push(`<li>${content}</li>`);
-            return;
-          }
-
-          if (/^---+$/.test(line.trim())) {
-            closeLists();
-            htmlParts.push('<hr>');
-            return;
-          }
-
-          closeLists();
-          const labelMatch = line.match(/^\*\*([^*]+?:)\s*\*\*(.*)$/);
-          if (labelMatch) {
-            const label = escapeHtml(labelMatch[1].trim());
-            const rest = renderInline(labelMatch[2].trim());
-            htmlParts.push(`<p><strong class="reply-label">${label}</strong>${rest ? ` ${rest}` : ''}</p>`);
-          } else {
-            htmlParts.push(`<p>${renderInline(line)}</p>`);
-          }
-        });
-
-        closeLists();
-        return htmlParts.join('');
+        const safe = typeof raw === 'string' ? raw : '';
+        return `<pre class="reply-plain">${escapeHtml(safe)}</pre>`;
       };
 
       const renderStatus = (text, variant = 'default') => {
