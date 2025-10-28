@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>製品リスク AIアシスタント</title>
+  <title>海外リスク対策 AIアシスタント</title>
   <style>
     :root {
       color-scheme: light dark;
-      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      line-height: 1.6;
+      --font-base: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Segoe UI', sans-serif;
+      font-family: var(--font-base);
+      line-height: 1.7;
       --shell-width: min(1080px, 96vw);
       --drawer-width: min(360px, 84vw);
       --primary: #1767c1;
@@ -37,6 +38,7 @@
         radial-gradient(circle at top left, rgba(26, 150, 204, 0.28), transparent 55%),
         linear-gradient(130deg, #0a1c31 0%, #174a7c 52%, #1f6da5 100%);
       color: var(--text-strong);
+      font-family: var(--font-base);
     }
 
     main {
@@ -161,39 +163,95 @@
       background: #ffffff;
       border: 1px solid var(--border);
       color: var(--text-soft);
-      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
       border-bottom-left-radius: 6px;
     }
 
-    .bubble.bot pre.reply-plain {
-      margin: 0;
-      font: inherit;
-      white-space: pre-wrap;
+    .reply-markdown {
+      display: grid;
+      gap: 0.65rem;
+      font-size: 0.97rem;
+      line-height: 1.75;
       word-break: break-word;
     }
 
-    .bubble.bot h2,
-    .bubble.bot h3,
-    .bubble.bot h4,
-    .bubble.bot h5,
-    .bubble.bot h6 {
+    .reply-markdown p {
+      margin: 0;
+    }
+
+    .reply-markdown h2,
+    .reply-markdown h3,
+    .reply-markdown h4,
+    .reply-markdown h5,
+    .reply-markdown h6 {
       margin: 0.5rem 0 0.35rem;
       font-size: 1.05rem;
       color: var(--primary);
       font-weight: 700;
     }
 
-    .bubble.bot h2:first-child,
-    .bubble.bot h3:first-child {
+    .reply-markdown h2:first-child,
+    .reply-markdown h3:first-child {
       margin-top: 0;
     }
 
-    .bubble.bot ul,
-    .bubble.bot ol {
+    .reply-markdown ul,
+    .reply-markdown ol {
       padding-left: 1.2rem;
       margin: 0.35rem 0;
       display: grid;
       gap: 0.25rem;
+    }
+
+    .reply-markdown li {
+      margin: 0.1rem 0;
+    }
+
+    .reply-markdown blockquote {
+      margin: 0;
+      padding-left: 1rem;
+      border-left: 4px solid rgba(23, 103, 193, 0.25);
+      color: var(--text-strong);
+      background: rgba(23, 103, 193, 0.06);
+    }
+
+    .reply-markdown blockquote p {
+      margin: 0.35rem 0;
+    }
+
+    .reply-markdown code {
+      font-family: 'SFMono-Regular', Consolas, 'BIZ UDGothic', monospace;
+      background: rgba(17, 41, 63, 0.08);
+      border-radius: 4px;
+      padding: 0.1rem 0.35rem;
+    }
+
+    .reply-markdown pre {
+      margin: 0.5rem 0;
+      padding: 0.9rem 1rem;
+      background: rgba(17, 41, 63, 0.08);
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: 'SFMono-Regular', Consolas, 'BIZ UDGothic', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .reply-markdown a {
+      color: var(--primary);
+      text-decoration: underline;
+      text-decoration-color: rgba(23, 103, 193, 0.45);
+    }
+
+    .reply-markdown hr {
+      border: none;
+      border-top: 1px dashed rgba(23, 103, 193, 0.25);
+      margin: 0.8rem 0;
+    }
+
+    .reply-truncated {
+      margin: 0.3rem 0 0;
+      font-size: 0.85rem;
+      color: rgba(17, 41, 63, 0.7);
     }
 
     .bubble.bot p {
@@ -452,20 +510,20 @@
 <body>
   <main>
     <header>
-      <h1>製品リスク　AIアシスタント</h1>
-      <p class="lead">― 製品安全・品質トラブルのAI相談 ―</p>
+      <h1>海外リスク対策 AIアシスタント</h1>
+      <p class="lead">＼ 海外重大事故対応を専門家視点でサポート ／</p>
       <div class="badge-row">
         <span class="badge">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 9.97-4.99L12 2zm0 7.73L4.18 6.6 12 3.27l7.82 3.33L12 9.73zM12 13l-7.82-3.33.01 3.91L12 17l7.81-3.42v-3.91L12 13zM4.19 16.09 12 19.73l7.81-3.64v2.71L12 22l-7.81-3.2v-2.71z"></path></svg>
-          ISO/IEC 31000 規格リファレンス
+          ISO/IEC 31000 準拠のリスクマネジメント
         </span>
         <span class="badge">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3Zm0 11L4.24 9 12 5l7.76 4L12 14Zm-7 2H3v4h2v-4Zm4 0H7v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Zm4 0h-2v4h2v-4Z"></path></svg>
-          PL法・消費生活用製品安全法の実務
+          PL訴訟・危機広報の実務知見
         </span>
         <span class="badge">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm1 17h-2v-2h2v2Zm0-4h-2V7h2v7Z"></path></svg>
-          行政・海外当局対応のベストプラクティス
+          多言語・海外規制の最新トレンド
         </span>
       </div>
     </header>
@@ -475,28 +533,28 @@
         <div class="messages" id="messages" aria-live="polite"></div>
         <div class="status-bar" id="status-bar" role="status"></div>
         <form id="chat-form" autocomplete="off">
-          <label class="sr-only" for="chat-input">相談内容を入力</label>
-          <input id="chat-input" type="text" name="message" placeholder="相談内容を入力..." required>
+          <label class="sr-only" for="chat-input">メッセージを入力</label>
+          <input id="chat-input" type="text" name="message" placeholder="質問を入力してください..." required>
           <button type="submit">送信</button>
         </form>
       </section>
       <aside class="drawer" id="guide-drawer">
         <section>
-          <h2>想定ユースケース</h2>
+          <h2>ナレッジベース</h2>
           <ul>
-            <li>サプライヤー由来の品質不正疑義を受けた際の初動整理</li>
-            <li>海外市場への自主回収を検討する際のマイルストーン設計</li>
-            <li>社内ガバナンス構築や是正措置の優先順位付け</li>
-            <li>消費者庁・NHTSA 等への報告フロー整備</li>
+            <li>製品事故の初動対応と証拠保全の要点</li>
+            <li>現地政府・規制当局への報告フロー</li>
+            <li>社内危機対策本部の立ち上げ手順</li>
+            <li>海外拠点との情報共有テンプレート</li>
           </ul>
         </section>
         <section>
-          <h2>クイック質問サンプル</h2>
+          <h2>クイック質問例</h2>
           <div class="suggestions">
-            <button type="button" class="suggestion-btn" data-message="海外で重大事故が発生した際の初動対応全体像を教えてください。">海外事故発生時の初動対応</button>
-            <button type="button" class="suggestion-btn" data-message="品質不正の再発防止策を構築するためのステップを整理してください。">品質不正再発防止のフレーム</button>
-            <button type="button" class="suggestion-btn" data-message="PL訴訟を見据えた証拠保全と社内体制づくりの要点を知りたいです。">PL訴訟対策の体制ポイント</button>
-            <button type="button" class="suggestion-btn" data-message="並行輸入品の安全リスク評価はどのように進めると良いでしょうか。">並行輸入品のリスク評価</button>
+            <button type="button" class="suggestion-btn" data-message="海外で重大事故が発生した直後に取るべき初動対応を整理してください。">初動対応の整理</button>
+            <button type="button" class="suggestion-btn" data-message="証拠保全の優先順位と注意点を教えてください。">証拠保全のポイント</button>
+            <button type="button" class="suggestion-btn" data-message="PL訴訟を見据えた社内体制づくりのチェックリストを作成してください。">PL訴訟への備え</button>
+            <button type="button" class="suggestion-btn" data-message="事故発生時の広報・報道対応のステップを教えてください。">広報対応フロー</button>
           </div>
         </section>
       </aside>
@@ -504,205 +562,19 @@
   </main>
   <div class="drawer-overlay" id="drawer-overlay"></div>
 
-  <script>
-    (() => {
-      const messagesEl = document.getElementById('messages');
-      const form = document.getElementById('chat-form');
-      const input = document.getElementById('chat-input');
-      const statusBar = document.getElementById('status-bar');
-      const suggestionButtons = document.querySelectorAll('.suggestion-btn');
-      const toggle = document.getElementById('drawer-toggle');
-      const guidePanel = document.getElementById('guide-drawer');
-      const overlay = document.getElementById('drawer-overlay');
-
-      const conversation = [];
-      let busy = false;
-
-      const escapeHtml = (str) => str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-
-      const renderInline = (text) => text
-        .split(/(\*\*[\s\S]+?\*\*)/g)
-        .map((segment) => {
-          const bold = segment.match(/^\*\*([\s\S]+?)\*\*$/);
-          if (bold) {
-            return `<strong>${escapeHtml(bold[1].trim())}</strong>`;
-          }
-          return escapeHtml(segment);
-        })
-        .join('');
-
-      const limitMarkdown = (text, maxChars) => {
-        if (typeof text !== 'string' || text.length === 0 || maxChars <= 0) {
-          return { text: '', truncated: Boolean(text && text.length > 0) };
-        }
-
-        if (text.length <= maxChars) {
-          return { text, truncated: false };
-        }
-
-        const trimmed = text.slice(0, maxChars).trimEnd();
-        return { text: trimmed.endsWith('...') ? trimmed : `${trimmed}...`, truncated: true };
-      };
-
-      const formatPlainText = (text) => text
-        .split(/\n{2,}/)
-        .map((block) => `<p>${renderInline(block)}</p>`)
-        .join('');
-
-      const formatReply = (raw) => {
-        const safe = typeof raw === 'string' ? raw : '';
-        return `<pre class="reply-plain">${escapeHtml(safe)}</pre>`;
-      };
-
-      const renderStatus = (text, variant = 'default') => {
-        statusBar.textContent = '';
-        statusBar.classList.remove('error', 'success');
-        if (variant === 'error') statusBar.classList.add('error');
-        if (variant === 'success') statusBar.classList.add('success');
-        if (!text) return;
-
-        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        icon.setAttribute('viewBox', '0 0 24 24');
-        icon.setAttribute('aria-hidden', 'true');
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        if (variant === 'error') {
-          path.setAttribute('d', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z');
-        } else if (variant === 'success') {
-          path.setAttribute('d', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 14-4-4 1.41-1.41L11 13.17l4.59-4.58L17 10l-6 6Z');
-        } else {
-          path.setAttribute('d', 'M11 7h2v5h-2zm0 6h2v2h-2zm1-11C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z');
-        }
-
-        icon.appendChild(path);
-        statusBar.appendChild(icon);
-        statusBar.appendChild(document.createTextNode(text));
-      };
-
-      const addMessage = (content, role, { isHtml = false } = {}) => {
-        const bubble = document.createElement('div');
-        bubble.className = `bubble ${role}`;
-        bubble.innerHTML = isHtml ? content : escapeHtml(content).replace(/\n/g, '<br>');
-        if (role === 'bot') {
-          bubble.classList.add('bot');
-        } else {
-          bubble.classList.add('user');
-        }
-        messagesEl.appendChild(bubble);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-        return bubble;
-      };
-
-      const setBusy = (state) => {
-        busy = state;
-        input.disabled = state;
-        form.querySelector('button[type="submit"]').disabled = state;
-      };
-
-      const closeDrawer = () => {
-        guidePanel.classList.remove('open');
-        overlay.classList.remove('visible');
-      };
-
-      const openDrawer = () => {
-        guidePanel.classList.add('open');
-        overlay.classList.add('visible');
-      };
-
-      const renderThinkingIndicator = () => `
-        <div class="thinking-indicator">
-          <span class="thinking-dot"></span>
-          <span class="thinking-dot"></span>
-          <span class="thinking-dot"></span>
-        </div>
-      `;
-
-      const removeFormalPreface = (text) => text.replace(/^承知いたしました。『ブルーシールド・リスクカウンシル』として、/u, '').trimStart();
-
-      const sendMessage = async (rawText) => {
-        const trimmed = rawText.trim();
-        if (!trimmed || busy) return;
-
-        addMessage(trimmed, 'user');
-        conversation.push({ role: 'user', text: trimmed });
-        setBusy(true);
-
-        const thinking = addMessage(renderThinkingIndicator(), 'bot', { isHtml: true });
-        thinking.classList.add('thinking');
-
-        try {
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: trimmed, history: conversation })
-          });
-
-          if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
-            throw new Error(data.error || `サーバーエラー (${response.status})`);
-          }
-
-          const data = await response.json();
-          const rawReply = removeFormalPreface((data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim());
-          const { text: limitedReply } = limitMarkdown(rawReply, 200);
-          let displayHtml = formatReply(limitedReply);
-          let statusMessage = data.notice || 'Gemini モデルと接続しました。';
-          thinking.classList.remove('thinking');
-          thinking.innerHTML = displayHtml;
-          conversation.push({ role: 'model', text: rawReply });
-          renderStatus(statusMessage, 'success');
-        } catch (error) {
-          thinking.classList.remove('thinking');
-          thinking.innerHTML = escapeHtml('エラーが発生しました。少し時間をおいて再試行してください。');
-          renderStatus(error.message || '予期しないエラーが発生しました。', 'error');
-        } finally {
-          setBusy(false);
-          input.focus();
-        }
-      };
-
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const value = input.value;
-        input.value = '';
-        sendMessage(value);
-      });
-
-      input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-          event.preventDefault();
-          form.dispatchEvent(new Event('submit'));
-        }
-      });
-
-      suggestionButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          input.value = button.dataset.message;
-          input.focus();
-          if (guidePanel.classList.contains('open')) closeDrawer();
-        });
-      });
-
-      toggle.addEventListener('click', () => {
-        if (guidePanel.classList.contains('open')) {
-          closeDrawer();
-        } else {
-          openDrawer();
-        }
-      });
-
-      overlay.addEventListener('click', closeDrawer);
-
-      const welcome = '現在抱えている課題や状況をお知らせください。初動整理、法規制の確認、社内体制づくりまで幅広くサポートします。';
-      addMessage(formatPlainText(welcome), 'bot', { isHtml: true });
-      conversation.push({ role: 'model', text: welcome });
-    })();
-  </script>
+    
+  <script src="app.js" defer></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
 

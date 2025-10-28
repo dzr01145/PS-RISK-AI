@@ -97,15 +97,15 @@ const buildGeminiPayload = (history, message) => {
   });
 
   const systemPrompt = [
-    "あなたは世界的なエキスパートコンサルタントです。",
-    "専門領域は製品安全、製造物責任（PL）、品質管理、品質不正対応、国内外のリコール実務です。",
-    "落ち着いたビジネス日本語を用い、次の観点を含む構成で整理してください。",
-    "1. 背景整理と課題の仮説",
-    "2. 想定される法的・レピュテーションリスク",
-    "3. 実務的な対応策・チェック項目（必要に応じて箇条書き）",
-    "4. 次に検討すべきアクションとフォローアップ",
-    "回答の最後には状況把握に役立つ確認質問を一つ添えてください。",
-    "結果表示は太字、見出しを入れた見やすい書式としてください。また、回答は全部で300文字程度以内で示してください。"
+    "あなたは海外リスク対応に特化した信頼性の高いアドバイザリーチャットボットです。",
+    "主な領域は製品事故、企業法務、PL訴訟、危機管理、危機広報です。",
+    "実務で使えるアクションリストと意思決定の勘所を具体的に提示してください。",
+    "1. 初動対応と証拠保全の要点",
+    "2. 現地当局・被害者・顧客へのコミュニケーション方針",
+    "3. 社内危機対策本部の体制と役割分担",
+    "4. 再発防止とナレッジ共有に向けたフォローアップ",
+    "回答は日本語で、根拠や前提条件を明示しながら冷静に助言してください。",
+    "全体でおおむね3000文字以内に収め、断定を避けつつも行動につながる提案を行ってください。"
   ].join("\n");
 
   return {
@@ -149,12 +149,12 @@ app.post("/api/chat", async (req, res) => {
   const { message, history } = req.body || {};
 
   if (typeof message !== "string" || !message.trim()) {
-    return res.status(400).json({ error: "message が空です。" });
+    return res.status(400).json({ error: "message フィールドを入力してください。" });
   }
 
   if (!apiKey) {
     return res.status(503).json({
-      error: "GOOGLE_API_KEY が設定されていません。Render の環境変数にキーを登録してください。"
+      error: "GOOGLE_API_KEY が設定されていません。Render の環境変数に API キーを登録してください。"
     });
   }
 
@@ -171,7 +171,7 @@ app.post("/api/chat", async (req, res) => {
       if (fallbackResult.ok) {
         result = fallbackResult;
         activeModel = fallbackModel;
-        notice = `指定モデル ${primaryModel} が利用できないため、${fallbackModel} で回答しました。`;
+        notice = `指定モデル ${primaryModel} が利用できなかったため、${fallbackModel} で回答しました。`;
       } else {
         result.detail += `\nFallback (${fallbackModel}) failed: ${fallbackResult.detail}`;
         result.status = fallbackResult.status;
@@ -188,7 +188,7 @@ app.post("/api/chat", async (req, res) => {
       }
 
       return res.status(result.status).json({
-        error: `Gemini API 呼び出しに失敗しました (${result.status})`,
+        error: `Gemini API の呼び出しに失敗しました (${result.status})`,
         details: detailMessage
       });
     }
@@ -200,7 +200,7 @@ app.post("/api/chat", async (req, res) => {
 
     if (!reply) {
       return res.status(502).json({
-        error: "Gemini API から有効な返答が得られませんでした。"
+        error: "Gemini API から有効な回答を取得できませんでした。"
       });
     }
 
@@ -210,7 +210,7 @@ app.post("/api/chat", async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      error: "サーバー内でエラーが発生しました。",
+      error: "サーバー側でエラーが発生しました。",
       details: error.message
     });
   }
@@ -226,3 +226,4 @@ const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {
   console.log(`Risk advisor server listening on port ${port}`);
 });
+
