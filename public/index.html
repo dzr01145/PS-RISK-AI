@@ -60,7 +60,7 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-size: clamp(1.8rem, 4.5vw, 2.4rem);
       font-weight: 700;
       letter-spacing: 0.08em;
       color: var(--primary);
@@ -696,14 +696,6 @@
           const rawReply = removeFormalPreface((data.reply || '回答が取得できませんでした。内容を整理して再度お試しください。').trim());
           let displayHtml = formatReply(rawReply);
           let statusMessage = data.notice || 'Gemini モデルと接続しました。';
-
-          const plainReply = stripHtml(displayHtml);
-          if (plainReply.length > 300) {
-            const truncated = plainReply.slice(0, 300).trimEnd();
-            displayHtml = formatReply(truncated + '…');
-            statusMessage = '300文字以内に要約して表示しました。';
-          }
-
           thinking.classList.remove('thinking');
           thinking.innerHTML = displayHtml;
           conversation.push({ role: 'model', text: rawReply });
