@@ -118,9 +118,8 @@ const buildGeminiPayload = (history, message) => {
       temperature: 0.7,
       topK: 40,
       topP: 0.9,
-      maxOutputTokens: 2048
-    },
-    responseMimeType: "text/plain"
+      maxOutputTokens: 1536
+    }
   };
 };
 
