@@ -118,8 +118,9 @@ const buildGeminiPayload = (history, message) => {
       temperature: 0.7,
       topK: 40,
       topP: 0.9,
-      maxOutputTokens: 768
-    }
+      maxOutputTokens: 2048
+    },
+    responseMimeType: "text/plain"
   };
 };
 
@@ -264,9 +265,20 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
+    if (usedCandidate?.finishReason === "MAX_TOKENS") {
+      console.warn("[Gemini] Response reached max token limit", {
+        model: result.model || activeModel,
+        finishReason: usedCandidate.finishReason
+      });
+    }
+
+    const baseNotice = usedCandidate?.finishReason === "MAX_TOKENS"
+      ? `${result.model || activeModel} で応答しました（生成上限に達したため途中まで）。`
+      : `${result.model || activeModel} で応答しました。`;
+
     return res.json({
       reply,
-      notice: notice || `${result.model || activeModel} で応答しました。`
+      notice: notice || baseNotice
     });
   } catch (error) {
     return res.status(500).json({
