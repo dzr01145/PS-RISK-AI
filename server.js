@@ -145,6 +145,39 @@ const callGemini = async (model, body, key) => {
   return { ok: true, data, model };
 };
 
+const extractTextFromParts = (parts) => {
+  if (!Array.isArray(parts)) return "";
+
+  return parts
+    .map((part) => {
+      if (typeof part?.text === "string") {
+        return part.text;
+      }
+      if (typeof part?.functionCall?.name === "string") {
+        const args = part.functionCall.args ? JSON.stringify(part.functionCall.args) : "";
+        return `関数呼び出し: ${part.functionCall.name}${args ? ` ${args}` : ""}`;
+      }
+      if (typeof part?.codeExecutionResult?.outputText === "string") {
+        return part.codeExecutionResult.outputText;
+      }
+      if (part?.inlineData?.data) {
+        const size = Buffer.from(part.inlineData.data, "base64").length;
+        const mimeType = part.inlineData.mimeType || "application/octet-stream";
+        return `インラインデータ (${mimeType}, ${size} bytes)`;
+      }
+      if (part?.fileData?.fileUri) {
+        return `ファイル参照: ${part.fileData.fileUri}`;
+      }
+      if (part?.outputAudio?.data) {
+        return "音声レスポンスが生成されました。";
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+};
+
 app.post("/api/chat", async (req, res) => {
   const { message, history } = req.body || {};
 
@@ -194,13 +227,40 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const parts = result.data?.candidates?.[0]?.content?.parts;
-    const reply = Array.isArray(parts)
-      ? parts.map((part) => part?.text || "").join("\n").trim()
-      : "";
+    const candidates = Array.isArray(result.data?.candidates) ? result.data.candidates : [];
+
+    let reply = "";
+    let usedCandidate;
+
+    for (const candidate of candidates) {
+      const candidateReply = extractTextFromParts(candidate?.content?.parts);
+      if (candidateReply) {
+        reply = candidateReply;
+        usedCandidate = candidate;
+        break;
+      }
+    }
 
     if (!reply) {
+      reply = extractTextFromParts(parts);
+      usedCandidate ??= result.data?.candidates?.[0];
+    }
+
+    if (!reply) {
+      const promptFeedback = result.data?.promptFeedback;
+      const finishReason = usedCandidate?.finishReason || promptFeedback?.blockReason;
+
+      console.error("[Gemini] Empty response", {
+        finishReason,
+        promptFeedback,
+        candidate: usedCandidate
+      });
+
       return res.status(502).json({
-        error: "Gemini API から有効な回答を取得できませんでした。"
+        error: "Gemini API から有効な回答を取得できませんでした。",
+        details: finishReason
+          ? `生成が停止された理由: ${finishReason}`
+          : "レスポンスにテキストが含まれていませんでした。"
       });
     }
 
