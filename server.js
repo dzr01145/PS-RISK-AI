@@ -12,7 +12,7 @@ const basicAuthUser = process.env.BASIC_AUTH_USER || "admin";
 const basicAuthPassword = process.env.BASIC_AUTH_PASSWORD || "123";
 const apiKey = process.env.GOOGLE_API_KEY;
 const primaryModel = process.env.GOOGLE_GEMINI_MODEL || "gemini-2.5-pro";
-const fallbackModel = process.env.GOOGLE_GEMINI_FALLBACK_MODEL || "gemini-2.5-flash-latest";
+const fallbackModel = process.env.GOOGLE_GEMINI_FALLBACK_MODEL || "gemini-1.5-flash-latest";
 
 const isHealthCheck = (req) => {
   const userAgent = req.headers["user-agent"] || "";
